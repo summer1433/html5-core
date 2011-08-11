@@ -1,0 +1,71 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>---</title>
+<style type="text/css">
+#canvas {
+	border: 1px solid #000;
+	box-shadow: 0 1px 5px #777;
+}
+</style>
+<script type="text/Javascript" src="../src/core.js"></script>
+</head>
+
+<body>
+	<div>
+		<canvas id="canvas" width="800" height="600"> </canvas>
+	</div>
+	<script language="Javascript">
+		var canvas = document.getElementById("canvas");
+
+		//var guid = new Guid(canvas, 20);
+		//guid.render();
+
+		var scene = new Scene(canvas, 1);
+
+		var cube1 = new Cube(scene, new NormalPoint(100, 300), 40, 40, 0);
+		cube1.setFillStyle('rgb(200,0,0)');
+		cube1.enableMoving();
+
+
+		for ( var i = 0; i < 30; i++) {
+			var size = 20
+			var x = Math.random() * 800;
+			var y = Math.random() * 600;
+			var cube2 = new Cube(scene, new NormalPoint(x, y), size, size, i + 1);
+			var fillStyle = 'hsl(' + Math.floor(360 * Math.random()) + ', '
+					+ Math.floor(Math.random() * 100) + '%, '
+					+ Math.floor(Math.random() * 100) + '%)';
+			cube2.setFillStyle(fillStyle);
+			cube2.enableMoving();
+
+		}
+
+		scene.ready();
+
+		//ctx = canvas.getContext("2d");
+		/* ctx.fillStyle = "rgb(200,0,0)";
+		ctx.fillRect(10, 10, 55, 50);
+
+		ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+		ctx.fillRect(30, 30, 55, 50); */
+		/* 
+		 ctx.beginPath();
+		 ctx.moveTo(75, 50);
+		 ctx.lineTo(100, 75);
+		 ctx.lineTo(100, 25);
+		 ctx.fill(); */
+
+		//	canvas.onmousemove = function(e) {
+		//	var mouse = getMouse(e);
+		//   context.clearRect(0, 0, width, height);
+		//console.log('mx:[' + mouse[0] + '],my:[' + mouse[1] + ']');
+		//}
+	</script>
+
+</body>
+</html>
