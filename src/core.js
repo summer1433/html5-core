@@ -56,9 +56,6 @@ var Scene = function(canvas, id) {
 
 Scene.prototype.ready = function() {
 	var self = this;
-	/*
-	 * setInterval(function() { self.renderAll(); }, 1);
-	 */
 	self.allReady();
 };
 
@@ -68,20 +65,45 @@ Scene.prototype.allReady = function() {
 		this.renderAble[i].canRenderme();
 		this.renderAble[i].ready();
 	}
+
+	var self = this;
+
+	setInterval(function() {
+		self.checkOverlap();
+	}, 1);
 };
 
 Scene.prototype.select = function(o) {
 	this.sos.push(o);
 };
 
+Scene.prototype.clearSelect = function() {
+	this.sos = new Array();
+};
+
+Scene.prototype.checkOverlap = function() {
+	for ( var i = 0; i < this.sos.length; i++) {
+		for ( var j = 0; j < this.renderAble.length; j++) {
+			if (this.sos[i].id != this.renderAble[j].id
+					&& this.sos[i].overlapping(this.renderAble[j])) {
+
+			}
+			;
+			// console.log('overlapping, cube id:' + this.renderAble[i]);
+
+		}
+	}
+};
+
 var Cube = function(scene, centerPosition, w, h, id) {
 	this.id = id;
 
-	var context = scene.canvas.getContext("2d");
-
+	this.scene = scene;
 	this.getCanvas = function() {
 		return scene.canvas;
 	};
+
+	var context = scene.canvas.getContext("2d");
 
 	this.getContext = function() {
 		return context;
@@ -112,6 +134,7 @@ var Cube = function(scene, centerPosition, w, h, id) {
 	scene.addRenderable(this);
 
 };
+
 Cube.prototype.render = function() {
 
 	var ctx = this.getContext();
@@ -120,11 +143,9 @@ Cube.prototype.render = function() {
 	if (this.isMoving && this.trackPositoin != null
 			&& this.trackPositoin.length >= 0) {
 
-		var i = 0;
 		while (this.trackPositoin.length != 0) {
 			var p = this.trackPositoin.pop();
-			i = i + 1;
-			console.log("clear rect i:" + i + ",p:" + p);
+			// console.log("clear rect i:" + i + ",p:" + p);
 			drawx = p.getX() - this.getW() / 2;
 			drawy = p.getY() - this.getH() / 2;
 			ctx.clearRect(drawx, drawy, this.getW(), this.getH());
@@ -138,6 +159,8 @@ Cube.prototype.render = function() {
 	var drawy = this.getCenterPosition().getY() - this.getH() / 2;
 
 	ctx.fillRect(drawx, drawy, this.getW(), this.getH());
+	ctx.fillStyle = 'white';
+	ctx.fillText(this.id, drawx, drawy+10);
 	// 3.clear fillStyle
 	ctx.fillStyle = '';
 
@@ -164,6 +187,30 @@ Cube.prototype.isSelect = function(mouse) {
 		inSelect = true;
 
 	return inSelect;
+};
+
+Cube.prototype.overlapping = function(c) {
+	var x1 = this.getCenterPosition().getX() - this.getW() / 2;
+	var x2 = this.getCenterPosition().getX() + this.getW() / 2;
+	var y1 = this.getCenterPosition().getY() - this.getH() / 2;
+	var y2 = this.getCenterPosition().getY() + this.getH() / 2;
+
+	var cx1 = c.getCenterPosition().getX() - c.getW() / 2;
+	var cx2 = c.getCenterPosition().getX() + c.getW() / 2;
+	var cy1 = c.getCenterPosition().getY() - c.getH() / 2;
+	var cy2 = c.getCenterPosition().getY() + c.getH() / 2;
+
+	if ((Math.abs(y1 - cy1) + Math.abs(y2 - cy2) >= this.getH() + c.getH())
+			|| (Math.abs(x1 - cx1) + Math.abs(x2 - cx2) >= this.getW()
+					+ c.getW())) {
+		return false;
+	} else {
+		console.log(c);
+		console.log(this);
+		console.log('overlapping..........');
+		c.render();
+		return true;
+	}
 };
 
 Cube.prototype.setFillStyle = function(style) {
@@ -220,6 +267,7 @@ Cube.prototype.addMovingAbility = function() {
 				if (self.isSelect(mouse) && self.isMoving) {
 					console.log('1.mousedown add mousemove listener, cube id:'
 							+ self.id);
+					self.scene.select(self);
 					self.getCanvas().addEventListener('mousemove',
 							mousemoveAction, false);
 
@@ -229,6 +277,7 @@ Cube.prototype.addMovingAbility = function() {
 							function() {
 								console.log('2.mouseup try to remove, cube id:'
 										+ self.id);
+								self.scene.clearSelect();
 								if (self.getCanvas().removeEventListener) {
 									console.log('3.remove event, cube id:'
 											+ self.id);
