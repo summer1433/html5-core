@@ -23,7 +23,7 @@ function getMouse(e, canvas) {
 	var x = e.clientX - getTrueOffsetLeft(canvas) + window.pageXOffset;
 	var y = e.clientY - getTrueOffsetTop(canvas) + window.pageYOffset;
 
-	// ¿ØÖÆ±ß½ç
+	// æŽ§åˆ¶è¾¹ç•Œ
 	return [ Math.min(width - 3, Math.max(3, x)),
 			Math.min(height - 3, Math.max(3, y)) ];
 
@@ -207,7 +207,7 @@ Cube.prototype.addMovingAbility = function() {
 	var mousemoveAction = function(evt) {
 		evt = window.event || arguments[0];
 		var mouse = getMouse(evt, self.getCanvas());
-		// ±£´æ¹ì¼£Â·¾¶
+		// è®°å½•è½¨è¿¹
 		self.addTrack(new NormalPoint(mouse[0], mouse[1]));
 		self.canRenderme();
 
