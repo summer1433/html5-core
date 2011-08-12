@@ -1,35 +1,40 @@
-function getTrueOffsetLeft(ele) {
-	var n = 0;
-	while (ele) {
-		n += ele.offsetLeft || 0;
-		ele = ele.offsetParent;
+var org = {};
+org.xiha = {};
+org.xiha.html5 = {};
+org.xiha.html5.core = {};
+org.xiha.html5.util = {
+	getTrueOffsetLeft : function(ele) {
+		var n = 0;
+		while (ele) {
+			n += ele.offsetLeft || 0;
+			ele = ele.offsetParent;
+		}
+
+		return n;
+	},
+	getTrueOffsetTop : function(ele) {
+		var n = 0;
+		while (ele) {
+			n += ele.offsetTop || 0;
+			ele = ele.offsetParent;
+		}
+		return n;
+	},
+
+	getMouse : function(e, canvas) {
+		var width = canvas.width;
+		var height = canvas.height;
+		var x = e.clientX - this.getTrueOffsetLeft(canvas) + window.pageXOffset;
+		var y = e.clientY - this.getTrueOffsetTop(canvas) + window.pageYOffset;
+
+		// 控制边界
+		return [ Math.min(width - 3, Math.max(3, x)),
+				Math.min(height - 3, Math.max(3, y)) ];
+
 	}
+};
 
-	return n;
-}
-
-function getTrueOffsetTop(ele) {
-	var n = 0;
-	while (ele) {
-		n += ele.offsetTop || 0;
-		ele = ele.offsetParent;
-	}
-	return n;
-}
-
-function getMouse(e, canvas) {
-	var width = canvas.width;
-	var height = canvas.height;
-	var x = e.clientX - getTrueOffsetLeft(canvas) + window.pageXOffset;
-	var y = e.clientY - getTrueOffsetTop(canvas) + window.pageYOffset;
-
-	// 控制边界
-	return [ Math.min(width - 3, Math.max(3, x)),
-			Math.min(height - 3, Math.max(3, y)) ];
-
-}
-
-var NormalPoint = function(x, y) {
+org.xiha.html5.core.NormalPoint = function(x, y) {
 	this.getX = function() {
 		return x;
 	};
@@ -38,11 +43,11 @@ var NormalPoint = function(x, y) {
 	};
 };
 
-NormalPoint.prototype.transTo = function() {
+org.xiha.html5.core.NormalPoint.prototype.transTo = function() {
 
 };
 
-var Scene = function(canvas, id) {
+org.xiha.html5.core.Scene = function(canvas, id) {
 
 	this.id = id;
 	this.renderAble = new Array();
@@ -54,12 +59,12 @@ var Scene = function(canvas, id) {
 
 };
 
-Scene.prototype.ready = function() {
+org.xiha.html5.core.Scene.prototype.ready = function() {
 	var self = this;
 	self.allReady();
 };
 
-Scene.prototype.allReady = function() {
+org.xiha.html5.core.Scene.prototype.allReady = function() {
 	console.log('renderall o');
 	for ( var i = 0; i < this.renderAble.length; i++) {
 		this.renderAble[i].canRenderme();
@@ -73,15 +78,15 @@ Scene.prototype.allReady = function() {
 	}, 1);
 };
 
-Scene.prototype.select = function(o) {
+org.xiha.html5.core.Scene.prototype.select = function(o) {
 	this.sos.push(o);
 };
 
-Scene.prototype.clearSelect = function() {
+org.xiha.html5.core.Scene.prototype.clearSelect = function() {
 	this.sos = new Array();
 };
 
-Scene.prototype.checkOverlap = function() {
+org.xiha.html5.core.Scene.prototype.checkOverlap = function() {
 	for ( var i = 0; i < this.sos.length; i++) {
 		for ( var j = 0; j < this.renderAble.length; j++) {
 			if (this.sos[i].id != this.renderAble[j].id
@@ -95,7 +100,7 @@ Scene.prototype.checkOverlap = function() {
 	}
 };
 
-var Cube = function(scene, centerPosition, w, h, id) {
+org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 	this.id = id;
 
 	this.scene = scene;
@@ -135,7 +140,7 @@ var Cube = function(scene, centerPosition, w, h, id) {
 
 };
 
-Cube.prototype.render = function() {
+org.xiha.html5.core.Cube.prototype.render = function() {
 
 	var ctx = this.getContext();
 	ctx.fillStyle = this.fillStyle;
@@ -160,23 +165,23 @@ Cube.prototype.render = function() {
 
 	ctx.fillRect(drawx, drawy, this.getW(), this.getH());
 	ctx.fillStyle = 'white';
-	ctx.fillText(this.id, drawx, drawy+10);
+	ctx.fillText(this.id, drawx, drawy + 10);
 	// 3.clear fillStyle
 	ctx.fillStyle = '';
 
 };
 
-Cube.prototype.enableMoving = function() {
+org.xiha.html5.core.Cube.prototype.enableMoving = function() {
 	this.isMoving = true;
 	this.addMovingAbility();
 };
 
-Cube.prototype.addTrack = function(newCenterPostion) {
+org.xiha.html5.core.Cube.prototype.addTrack = function(newCenterPostion) {
 	this.trackPositoin.push(this.centerPosition);
 	this.centerPosition = newCenterPostion;
 };
 
-Cube.prototype.isSelect = function(mouse) {
+org.xiha.html5.core.Cube.prototype.isSelect = function(mouse) {
 	var inSelect = false;
 	var x1 = this.getCenterPosition().getX() - this.getW() / 2;
 	var x2 = this.getCenterPosition().getX() + this.getW() / 2;
@@ -189,7 +194,7 @@ Cube.prototype.isSelect = function(mouse) {
 	return inSelect;
 };
 
-Cube.prototype.overlapping = function(c) {
+org.xiha.html5.core.Cube.prototype.overlapping = function(c) {
 	var x1 = this.getCenterPosition().getX() - this.getW() / 2;
 	var x2 = this.getCenterPosition().getX() + this.getW() / 2;
 	var y1 = this.getCenterPosition().getY() - this.getH() / 2;
@@ -205,37 +210,37 @@ Cube.prototype.overlapping = function(c) {
 					+ c.getW())) {
 		return false;
 	} else {
-		console.log(c);
-		console.log(this);
-		console.log('overlapping..........');
-		c.render();
+		//console.log(c);
+		//console.log(this);
+		// console.log('overlapping..........');
+		c.canRenderme();
 		return true;
 	}
 };
 
-Cube.prototype.setFillStyle = function(style) {
+org.xiha.html5.core.Cube.prototype.setFillStyle = function(style) {
 	this.fillStyle = style;
 };
 
-Cube.prototype.save = function() {
+org.xiha.html5.core.Cube.prototype.save = function() {
 	this.savedFillStyle = this.fillStyle;
 };
 
-Cube.prototype.restore = function() {
+org.xiha.html5.core.Cube.prototype.restore = function() {
 	this.fillStyle = this.savedFillStyle;
 };
-Cube.prototype.canRenderme = function() {
+org.xiha.html5.core.Cube.prototype.canRenderme = function() {
 	this.renderme = true;
 };
-Cube.prototype.stopRenderme = function() {
+org.xiha.html5.core.Cube.prototype.stopRenderme = function() {
 	this.renderme = false;
 };
-Cube.prototype.clickEnable = function() {
+org.xiha.html5.core.Cube.prototype.clickEnable = function() {
 	var self = this;
 	self.save();
 
 	this.getCanvas().addEventListener('click', function(evt) {
-		var mouse = getMouse(evt, self.getCanvas());
+		var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
 
 		if (self.isSelect(mouse)) {
 			console.log('select , cube id:' + self.id);
@@ -249,13 +254,13 @@ Cube.prototype.clickEnable = function() {
 
 };
 
-Cube.prototype.addMovingAbility = function() {
+org.xiha.html5.core.Cube.prototype.addMovingAbility = function() {
 	var self = this;
 	var mousemoveAction = function(evt) {
 		evt = window.event || arguments[0];
-		var mouse = getMouse(evt, self.getCanvas());
+		var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
 		// 记录轨迹
-		self.addTrack(new NormalPoint(mouse[0], mouse[1]));
+		self.addTrack(new org.xiha.html5.core.NormalPoint(mouse[0], mouse[1]));
 		self.canRenderme();
 
 	};
@@ -263,7 +268,7 @@ Cube.prototype.addMovingAbility = function() {
 			'mousedown',
 			function(evt) {
 
-				var mouse = getMouse(evt, self.getCanvas());
+				var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
 				if (self.isSelect(mouse) && self.isMoving) {
 					console.log('1.mousedown add mousemove listener, cube id:'
 							+ self.id);
@@ -297,7 +302,7 @@ Cube.prototype.addMovingAbility = function() {
 
 };
 
-Cube.prototype.ready = function() {
+org.xiha.html5.core.Cube.prototype.ready = function() {
 	var self = this;
 
 	setInterval(function() {

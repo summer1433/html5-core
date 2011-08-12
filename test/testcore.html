@@ -12,7 +12,7 @@
 	box-shadow: 0 1px 5px #777;
 }
 </style>
-<script type="text/Javascript" src="../src/core.js"></script>
+<script type="text/Javascript" src="../src/org.xiha.html5.core.js"></script>
 </head>
 
 <body>
@@ -25,9 +25,9 @@
 		//var guid = new Guid(canvas, 20);
 		//guid.render();
 
-		var scene = new Scene(canvas, 1);
+		var scene = new org.xiha.html5.core.Scene(canvas, 1);
 
-		var cube1 = new Cube(scene, new NormalPoint(100, 300), 40, 40, 0);
+		var cube1 = new org.xiha.html5.core.Cube(scene, new org.xiha.html5.core.NormalPoint(100, 300), 40, 40, 0);
 		cube1.setFillStyle('rgb(200,0,0)');
 		cube1.enableMoving();
 
@@ -36,12 +36,13 @@
 			var size = 20
 			var x = Math.floor(Math.random() * 800);
 			var y = Math.floor(Math.random() * 600);
-			var cube2 = new Cube(scene, new NormalPoint(x, y), size, size, i + 1);
+			var cube2 = new org.xiha.html5.core.Cube(scene, new org.xiha.html5.core.NormalPoint(x, y), size, size, i + 1);
 			var fillStyle = 'hsl(' + Math.floor(360 * Math.random()) + ', '
 					+ Math.floor(Math.random() * 100) + '%, '
 					+ Math.floor(Math.random() * 100) + '%)';
 			cube2.setFillStyle(fillStyle);
-			cube2.enableMoving();
+			cube2.clickEnable();
+			//cube2.enableMoving();
 
 		}
 
