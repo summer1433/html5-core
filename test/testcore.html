@@ -12,7 +12,12 @@
 	box-shadow: 0 1px 5px #777;
 }
 </style>
-<script type="text/Javascript" src="../src/org.xiha.html5.core.js"></script>
+
+<script type="text/Javascript" src="../src/org.xiha.html5.bootstrap.js"></script>
+<script type="text/Javascript">
+	request('org.xiha.html5.core');
+</script>
+
 </head>
 
 <body>
@@ -27,16 +32,18 @@
 
 		var scene = new org.xiha.html5.core.Scene(canvas, 1);
 
-		var cube1 = new org.xiha.html5.core.Cube(scene, new org.xiha.html5.core.NormalPoint(100, 300), 40, 40, 0);
+		var cube1 = new org.xiha.html5.core.Cube(scene,
+				new org.xiha.html5.core.NormalPoint(100, 300), 40, 40, 0);
 		cube1.setFillStyle('rgb(200,0,0)');
 		cube1.enableMoving();
-
 
 		for ( var i = 0; i < 30; i++) {
 			var size = 20
 			var x = Math.floor(Math.random() * 800);
 			var y = Math.floor(Math.random() * 600);
-			var cube2 = new org.xiha.html5.core.Cube(scene, new org.xiha.html5.core.NormalPoint(x, y), size, size, i + 1);
+			var cube2 = new org.xiha.html5.core.Cube(scene,
+					new org.xiha.html5.core.NormalPoint(x, y), size, size,
+					i + 1);
 			var fillStyle = 'hsl(' + Math.floor(360 * Math.random()) + ', '
 					+ Math.floor(Math.random() * 100) + '%, '
 					+ Math.floor(Math.random() * 100) + '%)';
