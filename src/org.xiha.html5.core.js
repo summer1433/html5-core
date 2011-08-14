@@ -24,6 +24,28 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.addRenderable = function(o) {
 		this.renderAble.push(o);
 	};
+	var self = this;
+	this.canvas.addEventListener('click', function() {
+
+		var evt = window.event || arguments[0];
+
+		var mouse = org.xiha.html5.util.getMouse(evt, self.canvas);
+
+		for ( var n = 0; n < self.renderAble.length; n++) {
+			var c = self.renderAble[n];
+			if (c.clickEnable)
+				if (c.isSelect(mouse)) {
+					// console.log(self);
+					// self.setFillStyle('rgb(0,0,0)');
+					c.canRenderme();
+				} else {
+					// self.restore();
+					c.canRenderme();
+				}
+		}
+
+	}, false);
+
 };
 org.xiha.html5.core.Scene.prototype = {
 	ready : function() {
@@ -85,12 +107,17 @@ org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 	this.getCenterPosition = function() {
 		return this.centerPosition;
 	};
+
 	this.getW = function() {
 		return w;
 	};
 	this.getH = function() {
 		return h;
 	};
+
+	this.clickEnable = false;
+
+	this.inSelect = false;
 
 	this.savedFillStyle = '';
 
@@ -100,6 +127,7 @@ org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 
 	this.trackPositoin = new Array();
 
+	this.clickDisable = false;
 	this.renderme = false;
 
 	scene.addRenderable(this);
@@ -108,6 +136,23 @@ org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 
 org.xiha.html5.core.Cube.prototype = {
 
+	caculateRect : function(position, w, h) {
+		return {
+			x : position.getX() - w / 2,
+			y : position.getY() - h / 2,
+			w : w,
+			h : h
+		};
+
+	},
+	caculateStrokeRect : function(rect, ctx) {
+		return {
+			x : rect.x + ctx.lineWidth / 2,
+			y : rect.y + ctx.lineWidth / 2,
+			w : rect.w - ctx.lineWidth,
+			h : rect.h - ctx.lineWidth
+		};
+	},
 	render : function() {
 
 		var ctx = this.getContext();
@@ -118,24 +163,34 @@ org.xiha.html5.core.Cube.prototype = {
 
 			while (this.trackPositoin.length != 0) {
 				var p = this.trackPositoin.pop();
-				// console.log("clear rect i:" + i + ",p:" + p);
-				drawx = p.getX() - this.getW() / 2;
-				drawy = p.getY() - this.getH() / 2;
-				ctx.clearRect(drawx, drawy, this.getW(), this.getH());
+				var r = this.caculateRect(p, this.getW(), this.getH());
+				ctx.clearRect(r.x, r.y, r.w, r.h);
 
 			}
 
 		}
 
 		// 2.draw to context
-		var drawx = this.getCenterPosition().getX() - this.getW() / 2;
-		var drawy = this.getCenterPosition().getY() - this.getH() / 2;
+		var r = this.caculateRect(this.getCenterPosition(), this.getW(), this
+				.getH());
+		// var drawx = this.getCenterPosition().getX() - this.getW() / 2;
+		// var drawy = this.getCenterPosition().getY() - this.getH() / 2;
 
-		ctx.fillRect(drawx, drawy, this.getW(), this.getH());
+		ctx.fillRect(r.x, r.y, r.w, r.h);
 		ctx.fillStyle = 'white';
-		ctx.fillText(this.id, drawx, drawy + 10);
+		ctx.fillText(this.id, r.x, r.y + 10);
 		// 3.clear fillStyle
 		ctx.fillStyle = '';
+
+		if (this.inSelect) {
+			ctx.lineWidth = '2';
+			ctx.strokeStyle = 'black';
+			var sr = this.caculateStrokeRect(r, ctx);
+			ctx.strokeRect(sr.x, sr.y, sr.w, sr.h);// stroke是从中间开始描
+			// ctx.strokeRect(drawx + ctx.lineWidth / 2,
+			// drawy + ctx.lineWidth / 2, this.getW() - ctx.lineWidth,
+			// this.getH() - ctx.lineWidth);// stroke是从中间开始描
+		}
 
 	},
 	enableMoving : function() {
@@ -149,17 +204,27 @@ org.xiha.html5.core.Cube.prototype = {
 	},
 
 	isSelect : function(mouse) {
-		var inSelect = false;
+		if (this.isOver(mouse)) {
+			if (!this.inSelect)
+				this.inSelect = true;
+			else
+				this.inSelect = false;
+		}
+		return this.inSelect;
+	},
+
+	isOver : function(mouse) {
 		var x1 = this.getCenterPosition().getX() - this.getW() / 2;
 		var x2 = this.getCenterPosition().getX() + this.getW() / 2;
 		var y1 = this.getCenterPosition().getY() - this.getH() / 2;
 		var y2 = this.getCenterPosition().getY() + this.getH() / 2;
 
 		if ((mouse[0] > x1 && mouse[0] < x2)
-				&& (mouse[1] > y1 && mouse[1] < y2))
-			inSelect = true;
-
-		return inSelect;
+				&& (mouse[1] > y1 && mouse[1] < y2)) {
+			return true;
+		} else {
+			return false;
+		}
 	},
 
 	overlapping : function(c) {
@@ -203,30 +268,11 @@ org.xiha.html5.core.Cube.prototype = {
 	stopRenderme : function() {
 		this.renderme = false;
 	},
-	clickEnable : function() {
-		var self = this;
-		self.save();
-
-		this.getCanvas().addEventListener('click', function(evt) {
-			var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
-
-			if (self.isSelect(mouse)) {
-				console.log('select , cube id:' + self.id);
-				self.setFillStyle('rgb(0,0,0)');
-				self.canRenderme();
-			} else {
-				self.restore();
-				self.canRenderme();
-			}
-			;
-		}, false);
-
-	},
 
 	addMovingAbility : function() {
 		var self = this;
-		var mousemoveAction = function(evt) {
-			evt = window.event || arguments[0];
+		var mousemoveAction = function() {
+			var evt = window.event || arguments[0];
 			var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
 			// 记录轨迹
 			self.addTrack(new org.xiha.html5.core.NormalPoint(mouse[0],
@@ -238,11 +284,12 @@ org.xiha.html5.core.Cube.prototype = {
 				.getCanvas()
 				.addEventListener(
 						'mousedown',
-						function(evt) {
+						function() {
+							var evt = window.event || arguments[0];
 
 							var mouse = org.xiha.html5.util.getMouse(evt, self
 									.getCanvas());
-							if (self.isSelect(mouse) && self.isMoving) {
+							if (self.isOver(mouse) && self.isMoving) {
 								console
 										.log('1.mousedown add mousemove listener, cube id:'
 												+ self.id);
