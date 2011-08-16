@@ -129,7 +129,8 @@ org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 
 	this.clickDisable = false;
 	this.renderme = false;
-
+	this.task = '';
+	
 	scene.addRenderable(this);
 
 };
@@ -173,8 +174,6 @@ org.xiha.html5.core.Cube.prototype = {
 		// 2.draw to context
 		var r = this.caculateRect(this.getCenterPosition(), this.getW(), this
 				.getH());
-		// var drawx = this.getCenterPosition().getX() - this.getW() / 2;
-		// var drawy = this.getCenterPosition().getY() - this.getH() / 2;
 
 		ctx.fillRect(r.x, r.y, r.w, r.h);
 		ctx.fillStyle = 'white';
@@ -187,9 +186,6 @@ org.xiha.html5.core.Cube.prototype = {
 			ctx.strokeStyle = 'black';
 			var sr = this.caculateStrokeRect(r, ctx);
 			ctx.strokeRect(sr.x, sr.y, sr.w, sr.h);// stroke是从中间开始描
-			// ctx.strokeRect(drawx + ctx.lineWidth / 2,
-			// drawy + ctx.lineWidth / 2, this.getW() - ctx.lineWidth,
-			// this.getH() - ctx.lineWidth);// stroke是从中间开始描
 		}
 
 	},
@@ -334,8 +330,7 @@ org.xiha.html5.core.Cube.prototype = {
 
 	ready : function() {
 		var self = this;
-
-		setInterval(function() {
+		this.task = setInterval(function() {
 			if (self.renderme) {
 				self.render();
 			}
