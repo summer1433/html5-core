@@ -122,6 +122,7 @@ org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 	this.savedFillStyle = '';
 
 	this.fillStyle = '';
+	this.image = null;
 
 	this.isMoving = false;
 
@@ -130,7 +131,7 @@ org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 	this.clickDisable = false;
 	this.renderme = false;
 	this.task = '';
-	
+
 	scene.addRenderable(this);
 
 };
@@ -176,6 +177,17 @@ org.xiha.html5.core.Cube.prototype = {
 				.getH());
 
 		ctx.fillRect(r.x, r.y, r.w, r.h);
+		if (this.image != null) {
+			// this.image.onload = function() {
+			try {
+				ctx.drawImage(this.image, r.x, r.y, r.w, r.h);
+
+			} catch (e) {
+				console.log('[' + r.x + ',' + r.y + ',' + r.w + ',' + r.h
+						+ ']-IMAGE[' + this.image.src + ']:' + e);
+			}
+			// };
+		}
 		ctx.fillStyle = 'white';
 		ctx.fillText(this.id, r.x, r.y + 10);
 		// 3.clear fillStyle
