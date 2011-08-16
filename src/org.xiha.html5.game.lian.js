@@ -28,7 +28,7 @@ org.xiha.html5.game.lian.Poker.prototype.destroy = function() {
 
 };
 org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
-		exampleStyle) {
+		exampleStyle, images) {
 
 	var pw = 40;
 	var ph = 40;
@@ -48,10 +48,10 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 					* pw, psy1 + (i - 1 / 2) * ph);
 			var poker = new org.xiha.html5.game.lian.Poker(scene, np, pw, ph,
 					new Array(i, j));
-			var styleIndex = Math.floor(Math.random() * 10) % 5;
+			var styleIndex = Math.floor(Math.random() * 10) % exampleStyle.length;
 
 			var fillStyle = exampleStyle[styleIndex];
-
+			poker.image = images[styleIndex];
 			poker.setFillStyle(fillStyle);
 			poker.clickEnable = true;
 
@@ -94,7 +94,7 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 			}
 		}
 
-		console.log('selectedPokerNum:' + selectedPokerNum);
+		//console.log('selectedPokerNum:' + selectedPokerNum);
 
 	}, false);
 };
@@ -103,7 +103,7 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 	var result = false;
 	var p1 = p[0];
 	var p2 = p[1];
-	if (p1.fillStyle == p2.fillStyle) {
+	if (p1.image.src == p2.image.src) {
 		if ((Math.abs(p1.id[0] - p2.id[0]) == 1 && p1.id[1] - p2.id[1] == 0)
 				|| (Math.abs(p1.id[1] - p2.id[1]) == 1 && p1.id[0] - p2.id[0] == 0)) {
 
@@ -123,9 +123,9 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 				}
 			}
 
-			for ( var i = p1.id[0] - 2; i >= -1; i--) {
+			for ( var i = p1.id[0] - 1; i >= -1; i--) {
 
-				if (i == -1 || this.wo[i][j1].destroyed) {
+				if (i == -1 || i == p1.id[0] - 1 || this.wo[i][j1].destroyed) {
 					i1.push(i);
 				} else {
 					break;
@@ -144,10 +144,10 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 					break;
 				}
 			}
+			// 包含自己
+			for ( var i = p2.id[0] - 1; i >= -1; i--) {
 
-			for ( var i = p2.id[0] - 2; i >= -1; i--) {
-
-				if (i == -1 || this.wo[i][j2].destroyed) {
+				if (i == -1 || i == p2.id[0] - 1 || this.wo[i][j2].destroyed) {
 					i2.push(i);
 				} else {
 					break;
@@ -196,10 +196,10 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 					break;
 				}
 			}
+			// 包含自己
+			for ( var j = p1.id[1] - 1; j >= -1; j--) {
 
-			for ( var j = p1.id[1] - 2; j >= -1; j--) {
-
-				if (j == -1 || this.wo[i1][j].destroyed) {
+				if (j == -1 || j == p1.id[1] - 1 || this.wo[i1][j].destroyed) {
 					j1.push(j);
 				} else {
 					break;
@@ -219,9 +219,9 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 				}
 			}
 
-			for ( var j = p2.id[1] - 2; j >= -1; j--) {
+			for ( var j = p2.id[1] - 1; j >= -1; j--) {
 
-				if (j == -1 || this.wo[i2][j].destroyed) {
+				if (j == -1 || j == p2.id[1] - 1 || this.wo[i2][j].destroyed) {
 					j2.push(j);
 				} else {
 					break;
@@ -229,7 +229,7 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 			}
 
 			for ( var m = 0; m < j1.length; m++) {
-				for ( var n = 0; n< j2.length; n++) {
+				for ( var n = 0; n < j2.length; n++) {
 					if ((j1[m] == -1 && j2[n] == -1)
 							|| (j1[m] == this.wsize && j2[n] == this.wsize)) {
 						return true;
