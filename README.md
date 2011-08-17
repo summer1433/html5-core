@@ -4,7 +4,7 @@ Overview
 
 功能列表
 ========================
-基本核心..
+基本核心
 
 * org.xiha.html5.bootstrap.js
 * org.xiha.html5.core.js
