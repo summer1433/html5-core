@@ -25,6 +25,13 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 		this.renderAble.push(o);
 	};
 	var self = this;
+	this.getWidth = function() {
+		return this.canvas.width;
+	};
+	this.getHeight = function(){
+		return this.canvas.height;
+	};
+	
 	this.canvas.addEventListener('click', function() {
 
 		var evt = window.event || arguments[0];

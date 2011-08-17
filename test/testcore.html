@@ -16,6 +16,7 @@
 <script type="text/Javascript" src="../src/org.xiha.html5.bootstrap.js"></script>
 <script type="text/Javascript">
 	request('org.xiha.html5.core');
+	request('org.xiha.html5.core.scene.ext');
 </script>
 
 </head>
@@ -39,7 +40,7 @@
 
 		cube1.enableMoving();
 
-		for ( var i = 0; i < 30; i++) {
+		for ( var i = 0; i < 1; i++) {
 			var size = 20
 			var x = Math.floor(Math.random() * 800);
 			var y = Math.floor(Math.random() * 600);
@@ -56,25 +57,7 @@
 		}
 
 		scene.ready();
-
-		//ctx = canvas.getContext("2d");
-		/* ctx.fillStyle = "rgb(200,0,0)";
-		ctx.fillRect(10, 10, 55, 50);
-
-		ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-		ctx.fillRect(30, 30, 55, 50); */
-		/* 
-		 ctx.beginPath();
-		 ctx.moveTo(75, 50);
-		 ctx.lineTo(100, 75);
-		 ctx.lineTo(100, 25);
-		 ctx.fill(); */
-
-		//	canvas.onmousemove = function(e) {
-		//	var mouse = getMouse(e);
-		//   context.clearRect(0, 0, width, height);
-		//console.log('mx:[' + mouse[0] + '],my:[' + mouse[1] + ']');
-		//}
+		scene.gravity(1);
 	</script>
 
 </body>
