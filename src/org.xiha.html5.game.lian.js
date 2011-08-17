@@ -258,11 +258,11 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 
 			}
 
-			console.log('not direct connect');
+			//console.log('not direct connect');
 			result = false;
 		}
 	} else {
-		console.log('fillStyle not match');
+		//console.log('fillStyle not match');
 		result = false;
 	}
 	return result;
