@@ -30,8 +30,8 @@ org.xiha.html5.game.lian.Poker.prototype.destroy = function() {
 org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 		exampleStyle, images) {
 
-	var pw = 40;
-	var ph = 40;
+	var pw = 30;
+	var ph = 30;
 	var psx1 = normalPoint.getX() - (pw * (wsize / 2));
 	var psy1 = normalPoint.getY() - (ph * (hsize / 2));
 	this.wsize = wsize;
@@ -48,7 +48,8 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 					* pw, psy1 + (i - 1 / 2) * ph);
 			var poker = new org.xiha.html5.game.lian.Poker(scene, np, pw, ph,
 					new Array(i, j));
-			var styleIndex = Math.floor(Math.random() * 10) % exampleStyle.length;
+			var styleIndex = Math.floor(Math.random() * 10)
+					% exampleStyle.length;
 
 			var fillStyle = exampleStyle[styleIndex];
 			poker.image = images[styleIndex];
@@ -94,7 +95,7 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 			}
 		}
 
-		//console.log('selectedPokerNum:' + selectedPokerNum);
+		// console.log('selectedPokerNum:' + selectedPokerNum);
 
 	}, false);
 };
@@ -170,9 +171,9 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 							max = j1;
 						}
 
-						for ( var x = min; x < max; x++) {
+						for ( var x = min + 1; x < max; x++) {
 							if (!this.wo[i1[m]][x].destroyed) {
-								break;
+								return false;
 							}
 						}
 
@@ -244,9 +245,9 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 							max = i1;
 						}
 
-						for ( var x = min; x < max; x++) {
+						for ( var x = min+1; x < max; x++) {
 							if (!this.wo[x][j1[m]].destroyed) {
-								break;
+								return false;
 							}
 						}
 
