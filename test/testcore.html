@@ -35,7 +35,7 @@
 		var cube1 = new org.xiha.html5.core.Cube(scene,
 				new org.xiha.html5.core.NormalPoint(200, 100), 100, 100, 0);
 		cube1.setFillStyle('rgb(200,0,0)');
-        cube1.clickEnable = true;
+		cube1.clickEnable = true;
 
 		cube1.enableMoving();
 
@@ -57,24 +57,39 @@
 
 		scene.ready();
 
-		//ctx = canvas.getContext("2d");
-		/* ctx.fillStyle = "rgb(200,0,0)";
-		ctx.fillRect(10, 10, 55, 50);
+		var renderAbleObject = scene.renderAble;
+		var ctx = scene.getContext();
+		ctx.strokeStyle = '#000000';
+		ctx.fillStyle = '#000000';
+		ctx.lineWidth = 1;
+		setInterval(function() {
+			for ( var m = 0; m < renderAbleObject.length; m++) {
+				if (m != renderAbleObject.length - 1) {
+					ctx.beginPath();
+					var o1 = renderAbleObject[m];
+					ctx.moveTo(o1.getX(), o1.getY());
+					var o2 = renderAbleObject[m + 1];
+					ctx.lineTo(o2.getX(), o2.getY());
+					console.log(o1.id + '[x1:' + o1.getX() + ',y1:' + o1.getY()
+							+ '],' + o2.id + '[x2:' + o2.getX() + ',y2:'
+							+ o2.getY() + ']');
+					ctx.stroke();
+				}
 
-		ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-		ctx.fillRect(30, 30, 55, 50); */
-		/* 
-		 ctx.beginPath();
-		 ctx.moveTo(75, 50);
-		 ctx.lineTo(100, 75);
-		 ctx.lineTo(100, 25);
-		 ctx.fill(); */
+			}
+		}, 1);
 
-		//	canvas.onmousemove = function(e) {
-		//	var mouse = getMouse(e);
-		//   context.clearRect(0, 0, width, height);
-		//console.log('mx:[' + mouse[0] + '],my:[' + mouse[1] + ']');
-		//}
+		/* ctx.beginPath();
+		ctx.moveTo(25, 25);
+		ctx.lineTo(105, 25);
+		ctx.lineTo(25, 105);
+		ctx.fill();
+		ctx.beginPath();
+		ctx.moveTo(125, 125);
+		ctx.lineTo(125, 45);
+		ctx.lineTo(45, 125);
+		ctx.closePath();
+		ctx.stroke(); */
 	</script>
 
 </body>

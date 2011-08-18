@@ -16,15 +16,28 @@ org.xiha.html5.core.NormalPoint.prototype.transTo = function() {
 };
 
 org.xiha.html5.core.Scene = function(canvas, id) {
-
+	var self = this;
 	this.id = id;
 	this.renderAble = new Array();
 	this.canvas = canvas;
 	this.sos = new Array();// selected objects
+
+	this.getWidth = function() {
+		this.getContext().width;
+	};
+
+	this.getHeight = function() {
+		this.getContext().height;
+	};
+
+	this.getContext = function() {
+		return this.canvas.getContext("2d");
+	};
+
 	this.addRenderable = function(o) {
 		this.renderAble.push(o);
 	};
-	var self = this;
+
 	this.canvas.addEventListener('click', function() {
 
 		var evt = window.event || arguments[0];
@@ -89,20 +102,37 @@ org.xiha.html5.core.Scene.prototype = {
 };
 
 org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
+	this.trackPositoin = new Array();
 	this.id = id;
-
 	this.scene = scene;
+	this.centerPosition = centerPosition;
+
+	this.clickEnable = false;
+	this.inSelect = false;
+	this.isMoving = false;
+	this.clickDisable = false;
+	this.renderme = false;
+
+	this.savedFillStyle = '';
+	this.fillStyle = '';
+	this.task = '';
+	this.image = null;
+
+	this.getX = function() {
+		return this.getCenterPosition().getX();
+	};
+
+	this.getY = function() {
+		return this.getCenterPosition().getY();
+	};
+
 	this.getCanvas = function() {
 		return scene.canvas;
 	};
 
-	var context = this.getCanvas().getContext("2d");
-
 	this.getContext = function() {
-		return context;
+		return this.scene.getContext();
 	};
-
-	this.centerPosition = centerPosition;
 
 	this.getCenterPosition = function() {
 		return this.centerPosition;
@@ -114,23 +144,6 @@ org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 	this.getH = function() {
 		return h;
 	};
-
-	this.clickEnable = false;
-
-	this.inSelect = false;
-
-	this.savedFillStyle = '';
-
-	this.fillStyle = '';
-	this.image = null;
-
-	this.isMoving = false;
-
-	this.trackPositoin = new Array();
-
-	this.clickDisable = false;
-	this.renderme = false;
-	this.task = '';
 
 	scene.addRenderable(this);
 
