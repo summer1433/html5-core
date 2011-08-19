@@ -16,6 +16,8 @@
 <script type="text/Javascript" src="../src/org.xiha.html5.bootstrap.js"></script>
 <script type="text/Javascript">
 	request('org.xiha.html5.core');
+	request('org.xiha.html5.core.scene');
+	request('org.xiha.html5.core.cube');
 </script>
 
 </head>
@@ -32,13 +34,43 @@
 
 		var scene = new org.xiha.html5.core.Scene(canvas, 1);
 
-		var cube1 = new org.xiha.html5.core.Cube(scene,
+		var cube = new org.xiha.html5.core.Cube(scene,
+				new org.xiha.html5.core.NormalPoint(400, 300), 800, 600, 100);
+
+		cube.render = function() {
+			var renderAbleObject = scene.renderAble;
+			var ctx = scene.getContext();
+			var r = this.caculateRect(this.getCenterPosition(), this.getW(),
+					this.getH());
+			ctx.clearRect(r.x, r.y, r.w, r.h);// stroke是从中间开始描
+
+			ctx.strokeStyle = '#000000';
+			ctx.fillStyle = '#000000';
+			ctx.lineWidth = 1;
+
+			for ( var m = 0; m < renderAbleObject.length; m++) {
+				if (m != renderAbleObject.length - 1) {
+					ctx.beginPath();
+					var o1 = renderAbleObject[m];
+					ctx.moveTo(o1.getX(), o1.getY());
+					var o2 = renderAbleObject[m + 1];
+					ctx.lineTo(o2.getX(), o2.getY());
+					/*  console.log(o1.id + '[x1:' + o1.getX() + ',y1:' + o1.getY()
+					         + '],' + o2.id + '[x2:' + o2.getX() + ',y2:'
+					         + o2.getY() + ']'); */
+					ctx.stroke();
+				}
+
+			}
+		}
+
+		/* var cube1 = new org.xiha.html5.core.Cube(scene,
 				new org.xiha.html5.core.NormalPoint(200, 100), 100, 100, 0);
 		cube1.setFillStyle('rgb(200,0,0)');
 		cube1.clickEnable = true;
 
 		cube1.enableMoving();
-
+		 */
 		for ( var i = 0; i < 30; i++) {
 			var size = 20
 			var x = Math.floor(Math.random() * 800);
@@ -56,40 +88,6 @@
 		}
 
 		scene.ready();
-
-		var renderAbleObject = scene.renderAble;
-		var ctx = scene.getContext();
-		ctx.strokeStyle = '#000000';
-		ctx.fillStyle = '#000000';
-		ctx.lineWidth = 1;
-		setInterval(function() {
-			for ( var m = 0; m < renderAbleObject.length; m++) {
-				if (m != renderAbleObject.length - 1) {
-					ctx.beginPath();
-					var o1 = renderAbleObject[m];
-					ctx.moveTo(o1.getX(), o1.getY());
-					var o2 = renderAbleObject[m + 1];
-					ctx.lineTo(o2.getX(), o2.getY());
-					console.log(o1.id + '[x1:' + o1.getX() + ',y1:' + o1.getY()
-							+ '],' + o2.id + '[x2:' + o2.getX() + ',y2:'
-							+ o2.getY() + ']');
-					ctx.stroke();
-				}
-
-			}
-		}, 1);
-
-		/* ctx.beginPath();
-		ctx.moveTo(25, 25);
-		ctx.lineTo(105, 25);
-		ctx.lineTo(25, 105);
-		ctx.fill();
-		ctx.beginPath();
-		ctx.moveTo(125, 125);
-		ctx.lineTo(125, 45);
-		ctx.lineTo(45, 125);
-		ctx.closePath();
-		ctx.stroke(); */
 	</script>
 
 </body>

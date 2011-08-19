@@ -17,7 +17,10 @@ org.xiha.html5.util.extend(org.xiha.html5.game.lian.Poker,
 org.xiha.html5.game.lian.Poker.prototype.destroy = function() {
 	var ctx = this.getContext();
 
-	clearInterval(this.task);
+	//clearInterval(this.task);
+	this.render  =function() {
+		
+	};
 	var r = this.caculateRect(this.getCenterPosition(), this.getW(), this
 			.getH());
 
@@ -30,8 +33,8 @@ org.xiha.html5.game.lian.Poker.prototype.destroy = function() {
 org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 		exampleStyle, images) {
 
-	var pw = 30;
-	var ph = 30;
+	var pw = 50;
+	var ph = 50;
 	var psx1 = normalPoint.getX() - (pw * (wsize / 2));
 	var psy1 = normalPoint.getY() - (ph * (hsize / 2));
 	this.wsize = wsize;
