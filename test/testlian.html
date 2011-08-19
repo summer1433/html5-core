@@ -17,8 +17,8 @@
 <script type="text/Javascript">
 	request('org.xiha.html5.util');
 	request('org.xiha.html5.core');
-    request('org.xiha.html5.core.scene');
-    request('org.xiha.html5.core.cube');
+	request('org.xiha.html5.core.scene');
+	request('org.xiha.html5.core.cube');
 	request('org.xiha.html5.game.lian');
 </script>
 </head>
@@ -34,29 +34,15 @@
 		//guid.render();
 
 		var scene = new org.xiha.html5.core.Scene(canvas, 1);
-		var exampleStyle = new Array("#FFFFFF", "#FFFFFF", "#FFFFFF",
-				"#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF",
-				"#FFFFFF");
-		var img1 = new Image();
-		img1.src = '1.png';
-		var img2 = new Image();
-		img2.src = '2.png';
-		var img3 = new Image();
-		img3.src = '3.png';
-		var img4 = new Image();
-		img4.src = '4.png';
-		var img5 = new Image();
-		img5.src = '5.png';
-		var img6 = new Image();
-		img6.src = '6.png';
-		var img7 = new Image();
-		img7.src = '7.png';
-		var img8 = new Image();
-		img8.src = '8.png';
-		var img9 = new Image();
-		img9.src = '9.png';
-		var images = new Array(img1, img2, img3, img4, img5, img6, img7, img8,
-				img9);
+		var exampleStyle = new Array();
+		var images = new Array();
+
+		for ( var i = 1; i <= 17; i++) {
+			var image = new Image();
+			image.src = i + '.png';
+			images.push(image);
+			exampleStyle.push('#ffffff');
+		}
 		var pokers = new org.xiha.html5.game.lian.Pokers(scene,
 				new org.xiha.html5.core.NormalPoint(400, 300), 8, 8,
 				exampleStyle, images);
