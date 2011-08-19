@@ -6,11 +6,11 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.sos = new Array();// selected objects
 
 	this.getWidth = function() {
-		this.getContext().width;
+		return this.canvas.width;
 	};
 
 	this.getHeight = function() {
-		this.getContext().height;
+		return this.canvas.height;
 	};
 
 	this.getContext = function() {
