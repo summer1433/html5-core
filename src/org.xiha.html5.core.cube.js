@@ -190,7 +190,6 @@ org.xiha.html5.core.Cube.prototype = {
 		this.fillStyle = this.savedFillStyle;
 	},
 	canRenderme : function() {
-		// 检测可渲染组件互相覆盖情况
 		this.renderme = true;
 	},
 	stopRenderme : function() {

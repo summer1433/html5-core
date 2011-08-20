@@ -28,26 +28,27 @@
 		<canvas id="canvas" width="800" height="600"> </canvas>
 	</div>
 	<script language="Javascript">
+		org.xiha.html5.util.imageResourceLoader.onComplete = function() {
+			console.log('finish');
+
+			var scene = new org.xiha.html5.core.Scene(canvas, 1);
+
+			var pokers = new org.xiha.html5.game.lian.Pokers(scene,
+					new org.xiha.html5.core.NormalPoint(400, 300), 8, 8,
+					org.xiha.html5.util.imageResourceLoader.images);
+
+			scene.ready();
+		}
+
 		var canvas = document.getElementById("canvas");
 
-		//var guid = new Guid(canvas, 20);
-		//guid.render();
-
-		var scene = new org.xiha.html5.core.Scene(canvas, 1);
-		var exampleStyle = new Array();
-		var images = new Array();
+		var imagessrc = new Array();
 
 		for ( var i = 1; i <= 17; i++) {
-			var image = new Image();
-			image.src = i + '.png';
-			images.push(image);
-			exampleStyle.push('#ffffff');
+			imagessrc.push(i + '.png');
 		}
-		var pokers = new org.xiha.html5.game.lian.Pokers(scene,
-				new org.xiha.html5.core.NormalPoint(400, 300), 8, 8,
-				exampleStyle, images);
-
-		scene.ready();
+		org.xiha.html5.util.imageResourceLoader.queue_images(imagessrc);
+		org.xiha.html5.util.imageResourceLoader.process_queue();
 	</script>
 
 </body>

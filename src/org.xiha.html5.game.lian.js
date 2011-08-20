@@ -17,9 +17,9 @@ org.xiha.html5.util.extend(org.xiha.html5.game.lian.Poker,
 org.xiha.html5.game.lian.Poker.prototype.destroy = function() {
 	var ctx = this.getContext();
 
-	//clearInterval(this.task);
-	this.render  =function() {
-		
+	// clearInterval(this.task);
+	this.render = function() {
+
 	};
 	var r = this.caculateRect(this.getCenterPosition(), this.getW(), this
 			.getH());
@@ -31,7 +31,7 @@ org.xiha.html5.game.lian.Poker.prototype.destroy = function() {
 
 };
 org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
-		exampleStyle, images) {
+		images) {
 
 	var pw = 50;
 	var ph = 50;
@@ -39,6 +39,37 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 	var psy1 = normalPoint.getY() - (ph * (hsize / 2));
 	this.wsize = wsize;
 	this.hsize = hsize;
+
+	var pokerImages = new Array();
+	var pokerNum = this.wsize * this.hsize;
+
+	if (pokerNum % 2 != 0) {
+		console.log('error not divide by 2 oOoOOOooOOooo00');
+	}
+	var imageIndex = 0;
+	for ( var i = 0; i < pokerNum; i = i + 2) {
+		if (imageIndex < images.length) {
+			pokerImages.push(images[imageIndex]);
+			pokerImages.push(images[imageIndex]);
+			imageIndex++;
+		} else {
+			var randomIndex = Math.floor(Math.random() * 1000) % images.length;
+			pokerImages.push(images[randomIndex]);
+			pokerImages.push(images[randomIndex]);
+		}
+
+	}
+
+	var tmp = new Image();
+	// 乱序images
+	for ( var i = 0; i < 1000; i++) {
+		var l = Math.floor(Math.random() * 1000) % pokerImages.length;
+		tmp = pokerImages[l];
+		pokerImages[l] = pokerImages[0];
+		pokerImages[0] = tmp;
+
+	}
+
 	this.scene = scene;
 	this.wo = new Array();
 	this.liainTPoints = new Array();
@@ -52,14 +83,11 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 					* pw, psy1 + (i - 1 / 2) * ph);
 			var poker = new org.xiha.html5.game.lian.Poker(scene, np, pw, ph,
 					new Array(i, j));
-			var styleIndex = Math.floor(Math.random() * 1000)
-					% exampleStyle.length;
 
-			var fillStyle = exampleStyle[styleIndex];
-			poker.image = images[styleIndex];
-			poker.setFillStyle(fillStyle);
+			poker.image = pokerImages[(i - 1) * wsize + (j - 1)];
+			poker.setFillStyle('#ffffff');
 			poker.clickEnable = true;
-
+			// poker.canRenderme();
 			ho.push(poker);
 		}
 		this.wo.push(ho);
@@ -295,11 +323,9 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 
 			}
 
-			// console.log('not direct connect');
 			result = false;
 		}
 	} else {
-		// console.log('fillStyle not match');
 		result = false;
 	}
 	return result;
