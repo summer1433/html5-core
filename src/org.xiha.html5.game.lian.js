@@ -17,7 +17,6 @@ org.xiha.html5.util.extend(org.xiha.html5.game.lian.Poker,
 org.xiha.html5.game.lian.Poker.prototype.destroy = function() {
 	var ctx = this.getContext();
 
-	// clearInterval(this.task);
 	this.render = function() {
 
 	};
@@ -72,19 +71,21 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 
 	this.scene = scene;
 	this.wo = new Array();
-	this.liainTPoints = new Array();
+	this.line = new org.xiha.html5.core.Line(this.scene, 2);
 
-	for ( var i = 1; i <= hsize; i++) {
+	for ( var i = 0; i < hsize; i++) {
 		var ho = new Array();
 
-		for ( var j = 1; j <= wsize; j++) {
+		for ( var j = 0; j < wsize; j++) {
 
-			var np = new org.xiha.html5.core.NormalPoint(psx1 + (j - 1 / 2)
-					* pw, psy1 + (i - 1 / 2) * ph);
-			var poker = new org.xiha.html5.game.lian.Poker(scene, np, pw, ph,
-					new Array(i, j));
+			var np = new org.xiha.html5.core.NormalPoint(psx1 + (j + 1 / 2)
+					* pw, psy1 + (i + 1 / 2) * ph);
+			var poker = new org.xiha.html5.game.lian.Poker(scene, np, pw, ph, {
+				'i' : i,
+				'j' : j
+			});
 
-			poker.image = pokerImages[(i - 1) * wsize + (j - 1)];
+			poker.image = pokerImages[i * wsize + j];
 			poker.setFillStyle('#ffffff');
 			poker.clickEnable = true;
 			// poker.canRenderme();
@@ -95,122 +96,152 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 	this.selectedPokers = new Array();
 
 	var self = this;
-	// add click listener
-	scene.canvas
-			.addEventListener(
-					'click',
-					function() {
-						var selectedPokerNum = 0;
-						var p1, p2;
 
-						var ctx = self.scene.getContext();
-						for ( var i = 0; i < self.wo.length; i++) {
-							for ( var j = 0; j < self.wo[i].length; j++) {
-								if (self.wo[i][j].inSelect) {
-									selectedPokerNum++;
+	clickAction = function() {
 
-									if (selectedPokerNum == 1) {
-										p1 = self.wo[i][j];
-									}
-									if (selectedPokerNum == 2) {
-										p2 = self.wo[i][j];
-										if (self
-												.checkLianTong(new Array(p1, p2))) {
+		var selectedPokerNum = 0;
+		var p1 = '', p2 = '';
 
-											if (self.liainTPoints != null) {
-												ctx.beginPath();
-												for ( var m = 0; m < self.liainTPoints.length; m++) {
-													var p = self.liainTPoints[m]
-															.getCenterPosition();
-													if (m == 0) {
-														ctx.moveTo(p.getX(), p
-																.getY());
-													} else {
+		var ctx = self.scene.getContext();
+		for ( var i = 0; i < self.wo.length; i++) {
+			for ( var j = 0; j < self.wo[i].length; j++) {
+				if (self.wo[i][j].inSelect) {
+					selectedPokerNum++;
 
-														ctx.lineTo(p.getX(), p
-																.getY());
-													}
-												}
+					if (selectedPokerNum == 1) {
+						p1 = self.wo[i][j];
+					}
+					if (selectedPokerNum == 2) {
+						p2 = self.wo[i][j];
+						if (self.checkLianTong(p1, p2)) {
+							// TODO draw line
 
-												ctx.fill();
-											}
+							console.log('destroy selected');
+							console.log(self.line.points);
+							p1.destroy();
+							p2.destroy();
 
-											p1.destroy();
-											p2.destroy();
-										}
-										p1.inSelect = false;
-										p2.inSelect = false;
-										selectedPokerNum = 0;
+							ctx.strokeStyle = 'hsl('
+									+ Math.floor(360 * Math.random()) + ', '
+									+ Math.floor(Math.random() * 100) + '%, '
+									+ Math.floor(Math.random() * 100) + '%)'; // line
+							// color
 
-										break;
+							for ( var mm = 0; mm < self.line.points.length; mm++) {
+								var p = self.line.points[mm];
+								ctx.beginPath();
+								ctx.arc(p.getX(), p.getY(), 5, 0, Math.PI * 2,
+										true);
+								ctx.closePath();
+								ctx.lineWidth = 2;
 
-									}
-
-									self.selectedPokers.push(self.wo[i][j]);
-									// console.log(self.wo[i][j]);
-								}
+								ctx.stroke();
 							}
+							self.line.clearPoints();
+
 						}
+						p1.inSelect = false;
+						p2.inSelect = false;
+						selectedPokerNum = 0;
 
-						// console.log('selectedPokerNum:' + selectedPokerNum);
+						break;
 
-					}, false);
+					}
+
+					// self.selectedPokers.push(self.wo[i][j]);
+					// console.log(self.wo[i][j]);
+				}
+			}
+		}
+
+		// console.log('selectedPokerNum:' + selectedPokerNum);
+
+	};
+
+	// add click listener
+
+	scene.canvas.addEventListener('click', clickAction, false);
+
 };
 
-org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
+org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p1, p2) {
 
 	var result = false;
-	var p1 = p[0];
-	var p2 = p[1];
+
 	if (p1.image.src == p2.image.src) {
-		if ((Math.abs(p1.id[0] - p2.id[0]) == 1 && p1.id[1] - p2.id[1] == 0)
-				|| (Math.abs(p1.id[1] - p2.id[1]) == 1 && p1.id[0] - p2.id[0] == 0)) {
+		if ((Math.abs(p1.id.i - p2.id.i) == 1 && p1.id.j - p2.id.j == 0)
+				|| (Math.abs(p1.id.j - p2.id.j) == 1 && p1.id.i - p2.id.i == 0)) {
+			// 两个Poker刚好相邻
+			this.line.addPoint(p1.getCenterPosition());
+			this.line.addPoint(p2.getCenterPosition());
 
 			result = true;
 		} else {
 			// scan1
-			var i1 = new Array();
+			var i1 = new Array(), i2 = new Array();
 
-			var j1 = p1.id[1] - 1;
+			for ( var i = p1.id.i; i <= this.hsize; i++) {
 
-			for ( var i = p1.id[0]; i <= this.hsize; i++) {
-
-				if (i == this.hsize || this.wo[i][j1].destroyed) {
+				if (i == this.hsize) {
+					i1.push(this.hsize);
+					break;
+				} else if (this.wo[i][p1.id.j].inSelect
+						|| this.wo[i][p1.id.j].destroyed) {
 					i1.push(i);
 				} else {
 					break;
 				}
 			}
 
-			for ( var i = p1.id[0] - 1; i >= -1; i--) {
+			for ( var i = p1.id.i; i >= -1; i--) {
 
-				if (i == -1 || i == p1.id[0] - 1 || this.wo[i][j1].destroyed) {
+				if (i == -1) {
+					i1.push(-1);
+					break;
+				} else if (this.wo[i][p1.id.j].inSelect
+						|| this.wo[i][p1.id.j].destroyed) {
 					i1.push(i);
 				} else {
 					break;
 				}
 			}
 
-			var i2 = new Array();
+			for ( var i = p2.id.i; i <= this.hsize; i++) {
 
-			var j2 = p2.id[1] - 1;
-
-			for ( var i = p2.id[0]; i <= this.hsize; i++) {
-
-				if (i == this.hsize || this.wo[i][j2].destroyed) {
+				if (i == this.hsize) {
+					i2.push(this.hsize);
+					break;
+				} else if (this.wo[i][p2.id.j].inSelect
+						|| this.wo[i][p2.id.j].destroyed) {
 					i2.push(i);
 				} else {
 					break;
 				}
 			}
 			// 包含自己
-			for ( var i = p2.id[0] - 1; i >= -1; i--) {
+			for ( var i = p2.id.i; i >= -1; i--) {
 
-				if (i == -1 || i == p2.id[0] - 1 || this.wo[i][j2].destroyed) {
+				if (i == -1) {
+					i2.push(-1);
+					break;
+				} else if (this.wo[i][p2.id.j].inSelect
+						|| this.wo[i][p2.id.j].destroyed) {
 					i2.push(i);
 				} else {
 					break;
 				}
+			}
+
+			var minY, maxY;
+			if (p1.id.j < p2.id.j) {
+				minY = p1.id.j;
+				maxY = p2.id.j;
+				this.line.addPoint(p1.getCenterPosition());
+			} else {
+				minY = p2.id.j;
+				maxY = p1.id.j;
+				this.line.addPoint(p2.getCenterPosition());
+
 			}
 
 			for ( var m = 0; m < i1.length; m++) {
@@ -221,25 +252,26 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 					}
 					var isConnected = true;
 					if (i1[m] == i2[n]) {
-						var min, max;
-						if (j1 < j2) {
-							min = j1;
-							max = j2;
-						} else {
-							min = j2;
-							max = j1;
-						}
+						var currentX = i1[m];
 
-						for ( var x = min + 1; x < max; x++) {
-
+						for ( var y = minY; y <= maxY; y++) {
+							var checkPoiont = this.wo[currentX][y];
 							isConnected = isConnected
-									&& this.wo[i1[m]][x].destroyed;
+									&& (checkPoiont.destroyed || checkPoiont.inSelect);
 							// 要遍历任意一组发现是联通状态，则返回TRUE
-							if (isConnected)
-								this.liainTPoints.push(this.wo[i1[m]][x]);
+
 						}
-						if (isConnected)// 发现联通。立即返回结果，无需续集探测
+						if (isConnected) {
+							console.log(minY + ',' + maxY);
+							this.line.addPoint(this.wo[currentX][minY]
+									.getCenterPosition());
+							this.line.addPoint(this.wo[currentX][maxY]
+									.getCenterPosition());
 							return true;
+						}// 发现联通。立即返回结果，无需续集探测
+						else {
+							this.line.clearPoints();
+						}
 					}
 
 				}
@@ -247,48 +279,71 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 			}
 
 			// scan2
-			var j1 = new Array();
+			var j1 = new Array(), j2 = new Array();
 
-			var i1 = p1.id[0] - 1;
+			for ( var j = p1.id.j; j <= this.wsize; j++) {
 
-			for ( var j = p1.id[1]; j <= this.wsize; j++) {
-
-				if (j == this.wsize || this.wo[i1][j].destroyed) {
+				if (j == this.wsize) {
+					j1.push(this.wsize);
+					break;
+				} else if (this.wo[p1.id.i][j].inSelect
+						|| this.wo[p1.id.i][j].destroyed) {
 					j1.push(j);
 				} else {
 					break;
 				}
 			}
 			// 包含自己
-			for ( var j = p1.id[1] - 1; j >= -1; j--) {
+			for ( var j = p1.id.j; j >= -1; j--) {
 
-				if (j == -1 || j == p1.id[1] - 1 || this.wo[i1][j].destroyed) {
+				if (j == -1) {
+					j1.push(-1);
+					break;
+				} else if (this.wo[p1.id.i][j].inSelect
+						|| this.wo[p1.id.i][j].destroyed) {
 					j1.push(j);
 				} else {
 					break;
 				}
 			}
 
-			var j2 = new Array();
+			for ( var j = p2.id.j; j <= this.wsize; j++) {
 
-			var i2 = p2.id[0] - 1;
-
-			for ( var j = p2.id[1]; j <= this.wsize; j++) {
-
-				if (j == this.wsize || this.wo[i2][j].destroyed) {
+				if (j == this.wsize) {
+					j2.push(this.wsize);
+					break;
+				} else if (this.wo[p2.id.i][j].inSelect
+						|| this.wo[p2.id.i][j].destroyed) {
 					j2.push(j);
 				} else {
 					break;
 				}
 			}
 
-			for ( var j = p2.id[1] - 1; j >= -1; j--) {
+			for ( var j = p2.id.j; j >= -1; j--) {
 
-				if (j == -1 || j == p2.id[1] - 1 || this.wo[i2][j].destroyed) {
+				if (j == -1) {
+					j2.push(-1);
+					break;
+				} else if (this.wo[p2.id.i][j].inSelect
+						|| this.wo[p2.id.i][j].destroyed) {
 					j2.push(j);
 				} else {
 					break;
 				}
+			}
+
+			var minX, maxX;
+			if (p1.id.i < p2.id.i) {
+				minX = p1.id.i;
+				maxX = p2.id.i;
+				this.line.addPoint(p1.getCenterPosition());
+
+			} else {
+				minX = p2.id.i;
+				maxX = p1.id.i;
+				this.line.addPoint(p2.getCenterPosition());
+
 			}
 
 			for ( var m = 0; m < j1.length; m++) {
@@ -300,23 +355,25 @@ org.xiha.html5.game.lian.Pokers.prototype.checkLianTong = function(p) {
 
 					var isConnected = true;
 					if (j1[m] == j2[n]) {
-						var min, max;
-						if (i1 < i2) {
-							min = i1;
-							max = i2;
-						} else {
-							min = i2;
-							max = i1;
-						}
+						var currentY = j1[m];
 
-						for ( var x = min + 1; x < max; x++) {
+						for ( var x = minX; x <= maxX; x++) {
+							var checkPoiont = this.wo[x][currentY];
 							isConnected = isConnected
-									&& this.wo[x][j1[m]].destroyed;
-							if (isConnected)
-								this.liainTPoints.push(this.wo[x][j1[m]]);
+									&& (checkPoiont.destroyed || checkPoiont.inSelect);
 						}
-						if (isConnected)
+						if (isConnected) {
+							console.log(minX + ',' + maxX);
+
+							this.line.addPoint(this.wo[minX][currentY]
+									.getCenterPosition());
+							this.line.addPoint(this.wo[maxX][currentY]
+									.getCenterPosition());
 							return true;
+						} else {
+							this.line.clearPoints();
+
+						}
 					}
 
 				}
