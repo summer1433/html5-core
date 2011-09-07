@@ -120,7 +120,7 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 							console.log(self.line.points);
 							p1.destroy();
 							p2.destroy();
-
+/*
 							ctx.strokeStyle = 'hsl('
 									+ Math.floor(360 * Math.random()) + ', '
 									+ Math.floor(Math.random() * 100) + '%, '
@@ -137,6 +137,7 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 
 								ctx.stroke();
 							}
+							*/
 							self.line.clearPoints();
 
 						}
