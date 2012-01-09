@@ -6,7 +6,8 @@ org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 	this.id = id;
 	this.scene = scene;
 	this.centerPosition = centerPosition;
-
+	this.mouseOverPosition = null;
+	
 	this.clickEnable = false;
 	this.inSelect = false;
 	this.isMoving = false;
@@ -153,6 +154,9 @@ org.xiha.html5.core.Cube.prototype = {
 
 		if ((mouse[0] > x1 && mouse[0] < x2)
 				&& (mouse[1] > y1 && mouse[1] < y2)) {
+			
+			this.mouseOverPosition = new org.xiha.html5.core.NormalPoint(mouse[0],mouse[1]);
+			
 			return true;
 		} else {
 			return false;
@@ -214,8 +218,9 @@ org.xiha.html5.core.Cube.prototype = {
  * @param x
  * @param y
  */
-org.xiha.html5.core.Cube.prototype.uniformMoveTo = function(x, y) {
+org.xiha.html5.core.Cube.prototype.uniformMoveTo = function(x, y, mx, my) {
 	this.addTrack(new org.xiha.html5.core.NormalPoint(x, y));
+	this.mouseOverPosition = new org.xiha.html5.core.NormalPoint(mx, my);
 
 };
 
@@ -225,7 +230,13 @@ org.xiha.html5.core.Cube.prototype.addMovingAbility = function() {
 		var evt = window.event || arguments[0];
 		var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
 		// 记录轨迹
-		self.uniformMoveTo(mouse[0], mouse[1]);
+		//TODO 计算鼠标落在cube内位置，取得相对位移。
+		var nx = self.centerPosition.getX() - (self.mouseOverPosition.getX() - mouse[0]);
+		var ny = self.centerPosition.getY() - (self.mouseOverPosition.getY() - mouse[1]);
+		console.log("nx:"+self.centerPosition.getX()+"-("+self.mouseOverPosition.getX()+"-"+mouse[0]+")")
+		console.log("ny:"+self.centerPosition.getY()+"-("+self.mouseOverPosition.getY()+"-"+mouse[1]+")")
+
+		self.uniformMoveTo(nx, ny, mouse[0], mouse[1]);
 		// /self.scene.checkOverlap();
 		self.scene.allRender = true;
 	};

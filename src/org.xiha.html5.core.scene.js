@@ -40,15 +40,15 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 
 	}, false);
 
-	this.canvas.addEventListener('mousemove', function() {
-		for ( var n = 0; n < self.renderAble.length; n++) {
-			var c = self.renderAble[n];
-			if (c.isSelect()) {
-
-			}
-			c.canRenderme();// 全部渲染效率也很OK，所以全部渲染吧
-		}
-	}, false);
+//	this.canvas.addEventListener('mousemove', function() {
+//		for ( var n = 0; n < self.renderAble.length; n++) {
+//			var c = self.renderAble[n];
+//			if (c.isSelect()) {
+//
+//			}
+//			c.canRenderme();// 全部渲染效率也很OK，所以全部渲染吧
+//		}
+//	}, false);
 
 };
 org.xiha.html5.core.Scene.prototype = {
