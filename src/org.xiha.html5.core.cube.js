@@ -68,7 +68,17 @@ org.xiha.html5.core.Cube.prototype = {
 			h : rect.h - ctx.lineWidth
 		};
 	},
+
+	renderbefore : function() {
+
+	},
+
+	renderafter : function() {
+
+	},
+
 	render : function() {
+		this.renderbefore();
 
 		var ctx = this.getContext();
 		ctx.fillStyle = this.fillStyle;
@@ -84,10 +94,10 @@ org.xiha.html5.core.Cube.prototype = {
 			}
 
 		}
-
 		// 2.draw to context
 		var r = this.caculateRect(this.getCenterPosition(), this.getW(), this
 				.getH());
+		ctx.clearRect(r.x, r.y, r.w, r.h);
 
 		ctx.fillRect(r.x, r.y, r.w, r.h);
 		if (this.image != null) {
@@ -101,10 +111,6 @@ org.xiha.html5.core.Cube.prototype = {
 			}
 			// };
 		}
-		ctx.fillStyle = 'white';
-		//ctx.fillText(this.id, r.x, r.y + 10);
-		// 3.clear fillStyle
-		ctx.fillStyle = '';
 
 		if (this.inSelect) {
 			ctx.lineWidth = '2';
@@ -112,7 +118,8 @@ org.xiha.html5.core.Cube.prototype = {
 			var sr = this.caculateStrokeRect(r, ctx);
 			ctx.strokeRect(sr.x, sr.y, sr.w, sr.h);// stroke是从中间开始描
 		}
-
+		// console.log('[' + r.x + ',' + r.y + ',' + r.w + ',' + r.h + ']');
+		this.renderafter();
 	},
 	enableMoving : function() {
 		this.isMoving = true;
@@ -124,7 +131,10 @@ org.xiha.html5.core.Cube.prototype = {
 		this.centerPosition = newCenterPostion;
 	},
 
-	isSelect : function(mouse) {
+	isSelect : function() {
+		var evt = window.event || arguments[0];
+
+		var mouse = org.xiha.html5.util.getMouse(evt, self.canvas);
 		if (this.isOver(mouse)) {
 			if (!this.inSelect)
 				this.inSelect = true;
@@ -135,6 +145,7 @@ org.xiha.html5.core.Cube.prototype = {
 	},
 
 	isOver : function(mouse) {
+		// console.log(mouse);
 		var x1 = this.getCenterPosition().getX() - this.getW() / 2;
 		var x2 = this.getCenterPosition().getX() + this.getW() / 2;
 		var y1 = this.getCenterPosition().getY() - this.getH() / 2;
@@ -205,7 +216,6 @@ org.xiha.html5.core.Cube.prototype = {
  */
 org.xiha.html5.core.Cube.prototype.uniformMoveTo = function(x, y) {
 	this.addTrack(new org.xiha.html5.core.NormalPoint(x, y));
-	this.canRenderme();
 
 };
 
@@ -216,40 +226,45 @@ org.xiha.html5.core.Cube.prototype.addMovingAbility = function() {
 		var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
 		// 记录轨迹
 		self.uniformMoveTo(mouse[0], mouse[1]);
-		self.scene.checkOverlap();
-
+		// /self.scene.checkOverlap();
+		self.scene.allRender = true;
 	};
 
 	var mousedownAction = function() {
 
 		var evt = window.event || arguments[0];
-
+		// console.log(self);
 		var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
 		if (self.isOver(mouse) && self.isMoving) {
-			console.log('1.mousedown add mousemove listener, cube id:'
+			console.log('1.mouse over the cube starting choose , cube id:'
 					+ self.id);
 			self.scene.select(self);
-			self.getCanvas().addEventListener('mousemove', mousemoveAction,
-					false);
+			if (self.scene.isInSelect(self)) {
+				console.log("2.cube " + self.id + " is inSelect");
+				self.getCanvas().addEventListener('mousemove', mousemoveAction,
+						false);
 
-			// when mouseup remove listener
-			self.getCanvas().addEventListener(
-					'mouseup',
-					function() {
-						console.log('2.mouseup try to remove, cube id:'
-								+ self.id);
-						self.scene.clearSelect();
-						if (self.getCanvas().removeEventListener) {
-							console.log('3.remove event, cube id:' + self.id);
+				// when mouseup remove listener
+				self.getCanvas().addEventListener(
+						'mouseup',
+						function() {
+							console.log('2.mouseup try to remove, cube id:'
+									+ self.id);
+							self.scene.clearSelect();
+							if (self.getCanvas().removeEventListener) {
+								console.log('3.remove event, cube id:'
+										+ self.id);
 
-							self.getCanvas().removeEventListener('mousemove',
-									mousemoveAction, false);
-							self.stopRenderme();
-						} else {
-							console.log('cant remove');
-						}
+								self.getCanvas().removeEventListener(
+										'mousemove', mousemoveAction, false);
+								self.scene.allRender = false;
+							} else {
+								console.log('cant remove');
+							}
 
-					}, false);
+						}, false);
+				self.scene.allRender = true;
+			}
 		}
 		;
 

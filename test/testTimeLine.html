@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>testTimeLine</title>
+<style type="text/css">
+
+#canvas {
+    border: 2px solid #000;
+    box-shadow: 0 1px 5px #777;
+}
+</style>
+
+<script type="text/Javascript" src="../src/org.xiha.html5.bootstrap.js"></script>
+<script type="text/Javascript">
+    request('org.xiha.html5.core');
+    request('org.xiha.html5.core.scene');
+    request('org.xiha.html5.core.cube');
+    request('org.xiha.html5.core.scene.ext');
+    request('org.xiha.html5.ext.timeline');
+
+</script>
+
+</head>
+
+<body>
+    <div>
+        <canvas id="canvas" width="800" height="100"> </canvas>
+    </div>
+    <script language="Javascript">
+        var canvas = document.getElementById("canvas");
+
+        //var guid = new Guid(canvas, 20);
+        //guid.render();
+
+        var scene = new org.xiha.html5.core.Scene(canvas, 1);
+
+        var hint = new org.xiha.html5.ext.timeline.Hint(scene,
+                new org.xiha.html5.core.NormalPoint(400, 30), 100, 20, 1111);
+        hint.setText('Hello Summer');
+        hint.show();
+        
+        var line =  org.xiha.html5.ext.timeline.Line(scene, null, 5, 30, 70, hint);
+        scene.ready();
+        //scene.gravity(1);
+    </script>
+
+</body>
+</html>

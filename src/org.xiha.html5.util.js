@@ -2,7 +2,7 @@ org.xiha.html5.util = {
 	getTrueOffsetLeft : function(ele) {
 		var n = 0;
 		while (ele) {
-			n += ele.offsetLeft || 0;
+			n += ele.offsetLeft + ele.clientLeft || 0;
 			ele = ele.offsetParent;
 		}
 
@@ -11,7 +11,7 @@ org.xiha.html5.util = {
 	getTrueOffsetTop : function(ele) {
 		var n = 0;
 		while (ele) {
-			n += ele.offsetTop || 0;
+			n += ele.offsetTop + ele.clientTop || 0;
 			ele = ele.offsetParent;
 		}
 		return n;

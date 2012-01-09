@@ -4,7 +4,9 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.renderAble = new Array();
 	this.canvas = canvas;
 	this.sos = new Array();// selected objects
-
+	this.isMultiSelect = false;
+	this.allRender = true;
+	
 	this.getWidth = function() {
 		return this.canvas.width;
 	};
@@ -23,27 +25,34 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 
 	this.canvas.addEventListener('click', function() {
 
-		var evt = window.event || arguments[0];
-
-		var mouse = org.xiha.html5.util.getMouse(evt, self.canvas);
-
 		for ( var n = 0; n < self.renderAble.length; n++) {
 			var c = self.renderAble[n];
 			if (c.clickEnable)
-				if (c.isSelect(mouse)) {
+				if (c.isSelect()) {
 					// console.log(self);
 					// self.setFillStyle('rgb(0,0,0)');
-					c.canRenderme();
+					// c.canRenderme();
 				} else {
 					// self.restore();
-					c.canRenderme();
+					// c.canRenderme();
 				}
 		}
 
 	}, false);
 
+	this.canvas.addEventListener('mousemove', function() {
+		for ( var n = 0; n < self.renderAble.length; n++) {
+			var c = self.renderAble[n];
+			if (c.isSelect()) {
+
+			}
+			c.canRenderme();// 全部渲染效率也很OK，所以全部渲染吧
+		}
+	}, false);
+
 };
 org.xiha.html5.core.Scene.prototype = {
+
 	ready : function() {
 		var self = this;
 		self.allReady();
@@ -62,38 +71,59 @@ org.xiha.html5.core.Scene.prototype = {
 		// 渲染所有可渲染的组件
 		// TODO 设定渲染先后顺序，因为渲染的时候需要Clear，所以必须得设定顺序
 		setInterval(function() {
-			for ( var i = 0; i < self.renderAble.length; i++) {
 
-				if (self.renderAble[i].renderme) {
+			
+
+			if (self.allRender) {
+				self.clearScene();
+				for ( var i = 0; i < self.renderAble.length; i++) {
+
 					self.renderAble[i].render();
+
 				}
-				self.renderAble[i].stopRenderme();
+
+				self.allRender = false;
 			}
+
+			//
+
 		}, 1);
 
 	},
+
+	enableMultiSelect : function() {
+		this.isMultiSelect = true;
+	},
+
+	isInSelect : function(o) {
+		for ( var i = 0; i < this.sos.length; i++) {
+			if (o.id == this.sos[i].id) {
+				return true;
+			}
+		}
+		return false;
+	},
+
 	select : function(o) {
-		this.sos.push(o);
+
+		if (this.isMultiSelect) {
+			this.sos.push(o);
+
+		} else {
+			if (this.sos.length == 0) {
+				this.sos.push(o);
+			} else if (this.sos.length == 1) {
+
+			}
+		}
+
 	},
 	clearSelect : function() {
 		this.sos = new Array();
 	},
-
-	/**
-	 * 循环检测是否互相重叠
-	 * TODO 实现递归检测所有链式重叠状况
-	 */
-	checkOverlap : function() {
-		for ( var i = 0; i < this.sos.length; i++) {
-			for ( var j = 0; j < this.renderAble.length; j++) {
-				if (this.sos[i].id != this.renderAble[j].id
-						&& this.sos[i].overlapping(this.renderAble[j])) {
-
-				}
-				;
-				// console.log('overlapping, cube id:' + this.renderAble[i]);
-
-			}
-		}
+	clearScene : function() {
+		// console.log("w:"+this.getWidth()+",h:"+this.getHeight());
+		this.getContext().clearRect(0, 0, this.getWidth(), this.getHeight());
 	}
+
 };

@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+<title>---</title>
+<style type="text/css">
+#canvas {
+	border: 1px solid #000;
+	box-shadow: 0 1px 5px #777;
+}
+</style>
+
+<script type="text/Javascript" src="../src/org.xiha.html5.bootstrap.js"></script>
+<script type="text/Javascript">
+	request('org.xiha.html5.core');
+	request('org.xiha.html5.core.scene');
+	request('org.xiha.html5.core.cube');
+	request('org.xiha.html5.core.connector');
+	request('org.xiha.html5.core.scene.ext');
+</script>
+
+</head>
+
+<body>
+	<div>
+		<canvas id="canvas" width="800" height="600"> </canvas>
+	</div>
+	<script language="Javascript">
+		var canvas = document.getElementById("canvas");
+
+		var scene = new org.xiha.html5.core.Scene(canvas, 1);
+	    var maxnum = 5;
+	    var preCube = null;
+		for (var i = 0; i < maxnum; i++) {
+			var size = 20;
+			var x = Math.floor(Math.random() * 800);
+			var y = Math.floor(Math.random() * 600);
+			var p = new org.xiha.html5.core.NormalPoint(x, y);
+			var cube = new org.xiha.html5.core.Cube(scene, p, size, size, i + 1);
+			var fillStyle = 'hsl(' + Math.floor(360 * Math.random()) + ', '
+					+ Math.floor(Math.random() * 100) + '%, '
+					+ Math.floor(Math.random() * 100) + '%)';
+			cube.setFillStyle(fillStyle);
+			cube.clickEnable = true;
+			cube.enableMoving();
+
+			if((preCube != null) && (i < maxnum)) {
+                new org.xiha.html5.core.Connector(scene, preCube, cube, '#000000', '#000000', 1);
+            }
+
+			preCube = cube;
+		}
+
+		scene.ready();
+		//scene.gravity(2);
+	</script>
+
+</body>
+</html>
