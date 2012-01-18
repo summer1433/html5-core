@@ -16,6 +16,7 @@
 <script type="text/Javascript" src="../src/org.xiha.html5.bootstrap.js"></script>
 <script type="text/Javascript">
 	request('org.xiha.html5.core');
+	request('org.xiha.html5.core.node')
 	request('org.xiha.html5.core.scene');
 	request('org.xiha.html5.core.cube');
 	request('org.xiha.html5.core.connector');
@@ -32,14 +33,40 @@
 		var canvas = document.getElementById("canvas");
 
 		var scene = new org.xiha.html5.core.Scene(canvas, 1);
-	    var maxnum = 5;
-	    var preCube = null;
-		for (var i = 0; i < maxnum; i++) {
+		var maxnum = 5;
+
+		var cube1 = createCube(1);
+		var cube2 = createCube(2);
+		var cube3 = createCube(3);
+		var cube4 = createCube(4);
+		var cube5 = createCube(5);
+		var cube6 = createCube(6);
+
+		var cube7 = createCube(7);
+		var cube8 = createCube(8);
+		var cube9 = createCube(9);
+	    //开始构造结点以及关联关系
+		var node = new org.xiha.html5.core.Node(cube1, null, null);
+		node.addChild(new org.xiha.html5.core.Node(cube2, cube1, null));
+		node.addChild(new org.xiha.html5.core.Node(cube3, cube1, null));
+		node.addChild(new org.xiha.html5.core.Node(cube4, cube1, null));
+		node.addChild(new org.xiha.html5.core.Node(cube5, cube1, null));
+		var node6 = new org.xiha.html5.core.Node(cube6, cube1, null);
+		node.addChild(node6);
+		node6.addChild(new org.xiha.html5.core.Node(cube7, cube6, null));
+		node6.addChild(new org.xiha.html5.core.Node(cube8, cube6, null));
+		node6.addChild(new org.xiha.html5.core.Node(cube9, cube6, null));
+
+		scene.setRootNode(node, new org.xiha.html5.core.NodeUtil(100));
+		scene.ready();
+		//scene.gravity(2);
+		function createCube(i) {
+
 			var size = 20;
-			var x = Math.floor(Math.random() * 800);
-			var y = Math.floor(Math.random() * 600);
-			var p = new org.xiha.html5.core.NormalPoint(x, y);
-			var cube = new org.xiha.html5.core.Cube(scene, p, size, size, i + 1);
+			//var x = Math.floor(Math.random() * 800);
+			//var y = Math.floor(Math.random() * 600);
+			//var p = new org.xiha.html5.core.NormalPoint(x, y);
+			var cube = new org.xiha.html5.core.Cube(scene, null, size, size, i + 1);
 			var fillStyle = 'hsl(' + Math.floor(360 * Math.random()) + ', '
 					+ Math.floor(Math.random() * 100) + '%, '
 					+ Math.floor(Math.random() * 100) + '%)';
@@ -47,15 +74,8 @@
 			cube.clickEnable = true;
 			cube.enableMoving();
 
-			if((preCube != null) && (i < maxnum)) {
-                new org.xiha.html5.core.Connector(scene, preCube, cube, '#000000', '#000000', 1);
-            }
-
-			preCube = cube;
+			return cube;
 		}
-
-		scene.ready();
-		//scene.gravity(2);
 	</script>
 
 </body>

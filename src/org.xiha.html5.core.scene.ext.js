@@ -1,6 +1,7 @@
 request('org.xiha.html5.core');
 
 org.xiha.html5.core.Scene.prototype.gravity = function(g) {
+	var t = 2;
 	var self = this;
 	setInterval(function() {
 		var renderAll = false;
@@ -14,20 +15,20 @@ org.xiha.html5.core.Scene.prototype.gravity = function(g) {
 					var finalY = self.getHeight() - (o.getH() / 2);
 
 					if (y < finalY) {
-
-						y = y + 1;
+						o.timer = o.timer + t;
+						y = y + (g * t * o.timer + g * t * t / 2)/1000;
 						o.addTrack(new org.xiha.html5.core.NormalPoint(x, y));
 						renderAll = true;
 
+					} else {
+						o.timer = 0;
 					}
 				}
 			}
 		}
 		if (renderAll)
-			for ( var i = 0; i < self.renderAble.length; i++) {
-				self.renderAble[i].canRenderme();
-			}
+			self.allRender = true;
 
-	}, g);
+	}, t);
 
 };

@@ -6,7 +6,12 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.sos = new Array();// selected objects
 	this.isMultiSelect = false;
 	this.allRender = true;
-	
+	this.rootNode = null;
+	this.nodeUtil = null;
+	this.setRootNode = function(node, nodeUtil) {
+		this.nodeUtil = nodeUtil;
+		this.rootNode = node;
+	};
 	this.getWidth = function() {
 		return this.canvas.width;
 	};
@@ -40,21 +45,24 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 
 	}, false);
 
-//	this.canvas.addEventListener('mousemove', function() {
-//		for ( var n = 0; n < self.renderAble.length; n++) {
-//			var c = self.renderAble[n];
-//			if (c.isSelect()) {
-//
-//			}
-//			c.canRenderme();// 全部渲染效率也很OK，所以全部渲染吧
-//		}
-//	}, false);
+	// this.canvas.addEventListener('mousemove', function() {
+	// for ( var n = 0; n < self.renderAble.length; n++) {
+	// var c = self.renderAble[n];
+	// if (c.isSelect()) {
+	//
+	// }
+	// c.canRenderme();// 全部渲染效率也很OK，所以全部渲染吧
+	// }
+	// }, false);
 
 };
 org.xiha.html5.core.Scene.prototype = {
 
 	ready : function() {
 		var self = this;
+		if (self.rootNode != null) {
+			this.nodeUtil.ergod(this.rootNode);
+		}
 		self.allReady();
 	},
 
@@ -72,10 +80,10 @@ org.xiha.html5.core.Scene.prototype = {
 		// TODO 设定渲染先后顺序，因为渲染的时候需要Clear，所以必须得设定顺序
 		setInterval(function() {
 
-			
-
 			if (self.allRender) {
+				
 				self.clearScene();
+				//self.nodeUtil.ergod(self.rootNode);
 				for ( var i = 0; i < self.renderAble.length; i++) {
 
 					self.renderAble[i].render();
@@ -107,13 +115,17 @@ org.xiha.html5.core.Scene.prototype = {
 	select : function(o) {
 
 		if (this.isMultiSelect) {
+			o.inSelect = true;
 			this.sos.push(o);
 
 		} else {
 			if (this.sos.length == 0) {
+				o.inSelect = true;
 				this.sos.push(o);
 			} else if (this.sos.length == 1) {
-
+				o.inSelect = true;
+				this.sos.pop();
+				this.sos.push(o);
 			}
 		}
 

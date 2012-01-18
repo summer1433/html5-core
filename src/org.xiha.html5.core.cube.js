@@ -4,6 +4,7 @@ request('org.xiha.html5.core.scene');
 org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 	this.trackPositoin = new Array();
 	this.id = id;
+	this.timer = 0;//计时用
 	this.scene = scene;
 	this.centerPosition = centerPosition;
 	this.mouseOverPosition = null;
@@ -233,8 +234,8 @@ org.xiha.html5.core.Cube.prototype.addMovingAbility = function() {
 		//TODO 计算鼠标落在cube内位置，取得相对位移。
 		var nx = self.centerPosition.getX() - (self.mouseOverPosition.getX() - mouse[0]);
 		var ny = self.centerPosition.getY() - (self.mouseOverPosition.getY() - mouse[1]);
-		console.log("nx:"+self.centerPosition.getX()+"-("+self.mouseOverPosition.getX()+"-"+mouse[0]+")")
-		console.log("ny:"+self.centerPosition.getY()+"-("+self.mouseOverPosition.getY()+"-"+mouse[1]+")")
+		//console.log("nx:"+self.centerPosition.getX()+"-("+self.mouseOverPosition.getX()+"-"+mouse[0]+")")
+		//console.log("ny:"+self.centerPosition.getY()+"-("+self.mouseOverPosition.getY()+"-"+mouse[1]+")")
 
 		self.uniformMoveTo(nx, ny, mouse[0], mouse[1]);
 		// /self.scene.checkOverlap();

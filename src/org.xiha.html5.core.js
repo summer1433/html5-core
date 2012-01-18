@@ -18,3 +18,5 @@ org.xiha.html5.core.NormalPoint = function(x, y) {
 org.xiha.html5.core.NormalPoint.prototype.transTo = function() {
 
 };
+
+
