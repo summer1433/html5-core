@@ -30,30 +30,9 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 
 	this.canvas.addEventListener('click', function() {
 
-		for ( var n = 0; n < self.renderAble.length; n++) {
-			var c = self.renderAble[n];
-			if (c.clickEnable)
-				if (c.isSelect()) {
-					// console.log(self);
-					// self.setFillStyle('rgb(0,0,0)');
-					// c.canRenderme();
-				} else {
-					// self.restore();
-					// c.canRenderme();
-				}
-		}
+		// this.allRender = true;
 
 	}, false);
-
-	// this.canvas.addEventListener('mousemove', function() {
-	// for ( var n = 0; n < self.renderAble.length; n++) {
-	// var c = self.renderAble[n];
-	// if (c.isSelect()) {
-	//
-	// }
-	// c.canRenderme();// 全部渲染效率也很OK，所以全部渲染吧
-	// }
-	// }, false);
 
 };
 org.xiha.html5.core.Scene.prototype = {
@@ -81,9 +60,9 @@ org.xiha.html5.core.Scene.prototype = {
 		setInterval(function() {
 
 			if (self.allRender) {
-				
+
 				self.clearScene();
-				//self.nodeUtil.ergod(self.rootNode);
+				// self.nodeUtil.ergod(self.rootNode);
 				for ( var i = 0; i < self.renderAble.length; i++) {
 
 					self.renderAble[i].render();
@@ -105,7 +84,7 @@ org.xiha.html5.core.Scene.prototype = {
 
 	isInSelect : function(o) {
 		for ( var i = 0; i < this.sos.length; i++) {
-			if (o.id == this.sos[i].id) {
+			if (o.id == this.sos[i].id && o.inSelect == true) {
 				return true;
 			}
 		}
@@ -123,9 +102,16 @@ org.xiha.html5.core.Scene.prototype = {
 				o.inSelect = true;
 				this.sos.push(o);
 			} else if (this.sos.length == 1) {
-				o.inSelect = true;
-				this.sos.pop();
-				this.sos.push(o);
+
+				var selected = this.sos.pop();
+				if (selected.id < o.id) {
+					selected.inSelect = false;
+					// selected.removeMouseMoveEvent();
+					o.inSelect = true;
+					this.sos.push(o);
+				} else {
+					this.sos.push(selected);
+				}
 			}
 		}
 

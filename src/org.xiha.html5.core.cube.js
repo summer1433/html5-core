@@ -3,12 +3,14 @@ request('org.xiha.html5.core.scene');
 
 org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 	this.trackPositoin = new Array();
+	this.w = w;
+	this.h = h;
 	this.id = id;
-	this.timer = 0;//计时用
+	this.timer = 0;// 计时用
 	this.scene = scene;
 	this.centerPosition = centerPosition;
 	this.mouseOverPosition = null;
-	
+
 	this.clickEnable = false;
 	this.inSelect = false;
 	this.isMoving = false;
@@ -41,12 +43,80 @@ org.xiha.html5.core.Cube = function(scene, centerPosition, w, h, id) {
 	};
 
 	this.getW = function() {
-		return w;
+		return this.w;
 	};
 	this.getH = function() {
-		return h;
+		return this.h;
 	};
 
+	this.setFillStyle = function(style) {
+		this.fillStyle = style;
+	};
+	this.enableMoving = function() {
+		this.isMoving = true;
+		this.addMovingAbility();
+	};
+	this.addMovingAbility = function() {
+		var self = this;
+		var mma = function() {
+			self.mousemoveAction();
+
+		};
+		var mda = function() {
+			self.mousedownAction(mma);
+		};
+
+		self.getCanvas().addEventListener('mousedown', mda, false);
+
+	};
+	
+	this.canRenderme = function() {
+		this.renderme = true;
+	};
+	
+	this.render = function() {
+		this.renderbefore();
+
+		var ctx = this.getContext();
+		ctx.fillStyle = this.fillStyle;
+		// console.log("render cube id:" + this.id);
+		// if (this.isMoving && this.trackPositoin != null
+		// && this.trackPositoin.length >= 0) {
+		//
+		// while (this.trackPositoin.length != 0) {
+		// var p = this.trackPositoin.pop();
+		// var r = this.caculateRect(p, this.getW(), this.getH());
+		// ctx.clearRect(r.x, r.y, r.w, r.h);
+		//
+		// }
+		//
+		// }
+		// 2.draw to context
+		var r = this.caculateRect(this.getCenterPosition(), this.getW(), this
+				.getH());
+		// ctx.clearRect(r.x, r.y, r.w, r.h);
+		ctx.fillRect(r.x, r.y, r.w, r.h);
+		if (this.image != null) {
+			// this.image.onload = function() {
+			try {
+				ctx.drawImage(this.image, r.x, r.y, r.w, r.h);
+
+			} catch (e) {
+				console.log('[' + r.x + ',' + r.y + ',' + r.w + ',' + r.h
+						+ ']-IMAGE[' + this.image.src + ']:' + e);
+			}
+		}
+
+		if (this.inSelect) {
+			ctx.lineWidth = '2';
+			ctx.strokeStyle = 'black';
+			var sr = this.caculateStrokeRect(r, ctx);
+			ctx.strokeRect(sr.x, sr.y, sr.w, sr.h);// stroke是从中间开始描
+		}
+		// console.log('[' + r.x + ',' + r.y + ',' + r.w + ',' + r.h + ']');
+		this.renderafter();
+	},
+	
 	scene.addRenderable(this);
 
 };
@@ -79,54 +149,7 @@ org.xiha.html5.core.Cube.prototype = {
 
 	},
 
-	render : function() {
-		this.renderbefore();
-
-		var ctx = this.getContext();
-		ctx.fillStyle = this.fillStyle;
-		// console.log("render cube id:" + this.id);
-		if (this.isMoving && this.trackPositoin != null
-				&& this.trackPositoin.length >= 0) {
-
-			while (this.trackPositoin.length != 0) {
-				var p = this.trackPositoin.pop();
-				var r = this.caculateRect(p, this.getW(), this.getH());
-				ctx.clearRect(r.x, r.y, r.w, r.h);
-
-			}
-
-		}
-		// 2.draw to context
-		var r = this.caculateRect(this.getCenterPosition(), this.getW(), this
-				.getH());
-		ctx.clearRect(r.x, r.y, r.w, r.h);
-
-		ctx.fillRect(r.x, r.y, r.w, r.h);
-		if (this.image != null) {
-			// this.image.onload = function() {
-			try {
-				ctx.drawImage(this.image, r.x, r.y, r.w, r.h);
-
-			} catch (e) {
-				console.log('[' + r.x + ',' + r.y + ',' + r.w + ',' + r.h
-						+ ']-IMAGE[' + this.image.src + ']:' + e);
-			}
-			// };
-		}
-
-		if (this.inSelect) {
-			ctx.lineWidth = '2';
-			ctx.strokeStyle = 'black';
-			var sr = this.caculateStrokeRect(r, ctx);
-			ctx.strokeRect(sr.x, sr.y, sr.w, sr.h);// stroke是从中间开始描
-		}
-		// console.log('[' + r.x + ',' + r.y + ',' + r.w + ',' + r.h + ']');
-		this.renderafter();
-	},
-	enableMoving : function() {
-		this.isMoving = true;
-		this.addMovingAbility();
-	},
+	
 
 	addTrack : function(newCenterPostion) {
 		this.trackPositoin.push(this.centerPosition);
@@ -155,11 +178,13 @@ org.xiha.html5.core.Cube.prototype = {
 
 		if ((mouse[0] > x1 && mouse[0] < x2)
 				&& (mouse[1] > y1 && mouse[1] < y2)) {
-			
-			this.mouseOverPosition = new org.xiha.html5.core.NormalPoint(mouse[0],mouse[1]);
-			
+
+			this.mouseOverPosition = new org.xiha.html5.core.NormalPoint(
+					mouse[0], mouse[1]);
+
 			return true;
 		} else {
+			this.inSelect = false;
 			return false;
 		}
 	},
@@ -194,10 +219,6 @@ org.xiha.html5.core.Cube.prototype = {
 		}
 	},
 
-	setFillStyle : function(style) {
-		this.fillStyle = style;
-	},
-
 	save : function() {
 		this.savedFillStyle = this.fillStyle;
 	},
@@ -205,9 +226,7 @@ org.xiha.html5.core.Cube.prototype = {
 	restore : function() {
 		this.fillStyle = this.savedFillStyle;
 	},
-	canRenderme : function() {
-		this.renderme = true;
-	},
+	
 	stopRenderme : function() {
 		this.renderme = false;
 	},
@@ -225,63 +244,66 @@ org.xiha.html5.core.Cube.prototype.uniformMoveTo = function(x, y, mx, my) {
 
 };
 
-org.xiha.html5.core.Cube.prototype.addMovingAbility = function() {
+/**
+ * mousemove action
+ */
+org.xiha.html5.core.Cube.prototype.mousemoveAction = function() {
+	var evt = window.event || arguments[0];
+	var mouse = org.xiha.html5.util.getMouse(evt, this.getCanvas());
+	// 记录轨迹
+	// TODO 计算鼠标落在cube内位置，取得相对位移。
+	var nx = this.centerPosition.getX()
+			- (this.mouseOverPosition.getX() - mouse[0]);
+	var ny = this.centerPosition.getY()
+			- (this.mouseOverPosition.getY() - mouse[1]);
+
+	this.uniformMoveTo(nx, ny, mouse[0], mouse[1]);
+	// /self.scene.checkOverlap();
+	this.scene.allRender = true;
+};
+
+/**
+ * 鼠标up事件
+ * 
+ * 当鼠标up时需要注销移动事件，移动事件做为参数传递进入函数
+ * 
+ * @param mma
+ *            鼠标移动事件
+ */
+org.xiha.html5.core.Cube.prototype.mouseupAction = function(mma) {
 	var self = this;
-	var mousemoveAction = function() {
-		var evt = window.event || arguments[0];
-		var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
-		// 记录轨迹
-		//TODO 计算鼠标落在cube内位置，取得相对位移。
-		var nx = self.centerPosition.getX() - (self.mouseOverPosition.getX() - mouse[0]);
-		var ny = self.centerPosition.getY() - (self.mouseOverPosition.getY() - mouse[1]);
-		//console.log("nx:"+self.centerPosition.getX()+"-("+self.mouseOverPosition.getX()+"-"+mouse[0]+")")
-		//console.log("ny:"+self.centerPosition.getY()+"-("+self.mouseOverPosition.getY()+"-"+mouse[1]+")")
+	console.log('2.mouseup try to remove, cube id:' + self.id);
+	self.scene.clearSelect();
+	if (self.getCanvas().removeEventListener) {
+		console.log('3.remove event, cube id:' + self.id);
 
-		self.uniformMoveTo(nx, ny, mouse[0], mouse[1]);
-		// /self.scene.checkOverlap();
-		self.scene.allRender = true;
+		self.getCanvas().removeEventListener('mousemove', mma, false);
+		self.scene.allRender = false;
+	} else {
+		console.log('cant remove');
+	}
+
+};
+
+org.xiha.html5.core.Cube.prototype.mousedownAction = function(mma) {
+	var self = this;
+	var mua = function() {
+		self.mouseupAction(mma);
 	};
-
-	var mousedownAction = function() {
-
-		var evt = window.event || arguments[0];
-		// console.log(self);
-		var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
-		if (self.isOver(mouse) && self.isMoving) {
-			console.log('1.mouse over the cube starting choose , cube id:'
-					+ self.id);
-			self.scene.select(self);
-			if (self.scene.isInSelect(self)) {
-				console.log("2.cube " + self.id + " is inSelect");
-				self.getCanvas().addEventListener('mousemove', mousemoveAction,
-						false);
-
-				// when mouseup remove listener
-				self.getCanvas().addEventListener(
-						'mouseup',
-						function() {
-							console.log('2.mouseup try to remove, cube id:'
-									+ self.id);
-							self.scene.clearSelect();
-							if (self.getCanvas().removeEventListener) {
-								console.log('3.remove event, cube id:'
-										+ self.id);
-
-								self.getCanvas().removeEventListener(
-										'mousemove', mousemoveAction, false);
-								self.scene.allRender = false;
-							} else {
-								console.log('cant remove');
-							}
-
-						}, false);
-				self.scene.allRender = true;
-			}
+	var evt = window.event || arguments[0];
+	var mouse = org.xiha.html5.util.getMouse(evt, self.getCanvas());
+	if (self.isOver(mouse) && self.isMoving) {
+		console.log('1.mouse over the cube starting choose , cube id:'
+				+ self.id);
+		self.scene.select(self);
+		if (self.scene.isInSelect(self)) {
+			console.log("2.cube " + self.id + " is inSelect");
+			self.getCanvas().addEventListener('mousemove', mma, false);
+			// when mouseup remove listener
+			self.getCanvas().addEventListener('mouseup', mua, false);
+			self.scene.allRender = true;
 		}
-		;
-
-	};
-
-	self.getCanvas().addEventListener('mousedown', mousedownAction, false);
+	}
+	;
 
 };

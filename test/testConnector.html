@@ -19,6 +19,8 @@
 	request('org.xiha.html5.core.node')
 	request('org.xiha.html5.core.scene');
 	request('org.xiha.html5.core.cube');
+	request('org.xiha.html5.core.arccube');
+
 	request('org.xiha.html5.core.connector');
 	request('org.xiha.html5.core.scene.ext');
 </script>
@@ -35,6 +37,18 @@
 		var scene = new org.xiha.html5.core.Scene(canvas, 1);
 		var maxnum = 5;
 
+		var x = Math.floor(200);
+		var y = Math.floor(200);
+		//var p = new org.xiha.html5.core.NormalPoint(x, y);
+		var circle = new org.xiha.html5.core.Arccube(scene, null, 100, 40, 99);
+		circle.r = 10;
+		var fillStyle = 'hsl(' + Math.floor(360 * Math.random()) + ', '
+				+ Math.floor(Math.random() * 100) + '%, '
+				+ Math.floor(Math.random() * 100) + '%)';
+		circle.setFillStyle(fillStyle);
+		circle.clickEnable = true;
+		circle.enableMoving();
+
 		var cube1 = createCube(1);
 		var cube2 = createCube(2);
 		var cube3 = createCube(3);
@@ -45,9 +59,20 @@
 		var cube7 = createCube(7);
 		var cube8 = createCube(8);
 		var cube9 = createCube(9);
-	    //开始构造结点以及关联关系
+		var cube10 = createCube(10);
+		var cube11 = createCube(11);
+		var cube12 = createCube(12);
+		var cube13 = createCube(13);
+		//开始构造结点以及关联关系
 		var node = new org.xiha.html5.core.Node(cube1, null, null);
-		node.addChild(new org.xiha.html5.core.Node(cube2, cube1, null));
+		var node2 = new org.xiha.html5.core.Node(cube2, cube1, null);
+		node.addChild(node2);
+		node2.addChild(new org.xiha.html5.core.Node(circle, cube2, null));
+		node2.addChild(new org.xiha.html5.core.Node(cube10, cube2, null));
+		node2.addChild(new org.xiha.html5.core.Node(cube11, cube2, null));
+		node2.addChild(new org.xiha.html5.core.Node(cube12, cube2, null));
+		node2.addChild(new org.xiha.html5.core.Node(cube13, cube2, null));
+
 		node.addChild(new org.xiha.html5.core.Node(cube3, cube1, null));
 		node.addChild(new org.xiha.html5.core.Node(cube4, cube1, null));
 		node.addChild(new org.xiha.html5.core.Node(cube5, cube1, null));
@@ -66,7 +91,8 @@
 			//var x = Math.floor(Math.random() * 800);
 			//var y = Math.floor(Math.random() * 600);
 			//var p = new org.xiha.html5.core.NormalPoint(x, y);
-			var cube = new org.xiha.html5.core.Cube(scene, null, size, size, i + 1);
+			var cube = new org.xiha.html5.core.Cube(scene, null, size, size,
+					i + 1);
 			var fillStyle = 'hsl(' + Math.floor(360 * Math.random()) + ', '
 					+ Math.floor(Math.random() * 100) + '%, '
 					+ Math.floor(Math.random() * 100) + '%)';
