@@ -40,48 +40,15 @@
 		var x = Math.floor(200);
 		var y = Math.floor(200);
 		//var p = new org.xiha.html5.core.NormalPoint(x, y);
-		var circle = new org.xiha.html5.core.Arccube(scene, null, 100, 40, 99);
-		circle.r = 10;
-		var fillStyle = 'hsl(' + Math.floor(360 * Math.random()) + ', '
-				+ Math.floor(Math.random() * 100) + '%, '
-				+ Math.floor(Math.random() * 100) + '%)';
-		circle.setFillStyle(fillStyle);
-		circle.clickEnable = true;
-		circle.enableMoving();
-
+		
 		var cube1 = createCube(1);
 		var cube2 = createCube(2);
-		var cube3 = createCube(3);
-		var cube4 = createCube(4);
-		var cube5 = createCube(5);
-		var cube6 = createCube(6);
-
-		var cube7 = createCube(7);
-		var cube8 = createCube(8);
-		var cube9 = createCube(9);
-		var cube10 = createCube(10);
-		var cube11 = createCube(11);
-		var cube12 = createCube(12);
-		var cube13 = createCube(13);
+		
 		//开始构造结点以及关联关系
 		var node = new org.xiha.html5.core.Node(cube1, null, null);
 		var node2 = new org.xiha.html5.core.Node(cube2, cube1, null);
 		node.addChild(node2);
-		node2.addChild(new org.xiha.html5.core.Node(circle, cube2, null));
-		node2.addChild(new org.xiha.html5.core.Node(cube10, cube2, null));
-		node2.addChild(new org.xiha.html5.core.Node(cube11, cube2, null));
-		node2.addChild(new org.xiha.html5.core.Node(cube12, cube2, null));
-		node2.addChild(new org.xiha.html5.core.Node(cube13, cube2, null));
-
-		node.addChild(new org.xiha.html5.core.Node(cube3, cube1, null));
-		node.addChild(new org.xiha.html5.core.Node(cube4, cube1, null));
-		node.addChild(new org.xiha.html5.core.Node(cube5, cube1, null));
-		var node6 = new org.xiha.html5.core.Node(cube6, cube1, null);
-		node.addChild(node6);
-		node6.addChild(new org.xiha.html5.core.Node(cube7, cube6, null));
-		node6.addChild(new org.xiha.html5.core.Node(cube8, cube6, null));
-		node6.addChild(new org.xiha.html5.core.Node(cube9, cube6, null));
-
+		
 		scene.setRootNode(node, new org.xiha.html5.core.NodeUtil(100));
 		scene.ready();
 		//scene.gravity(2);

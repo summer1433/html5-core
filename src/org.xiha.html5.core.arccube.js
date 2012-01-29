@@ -28,7 +28,6 @@ org.xiha.html5.core.Arccube = function(scene, centerPosition, w, h, id) {
 	};
 
 	this.ccRect = function(position, w, h, r) {
-		console.log("fff");
 		return {
 			c1 : {
 				x : (position.getX() - (w / 2 - r)),
