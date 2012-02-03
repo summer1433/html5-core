@@ -1,30 +1,50 @@
 request('org.xiha.html5.core');
 
-org.xiha.html5.core.Arccube = function(scene, centerPosition, w, h, id) {
-	org.xiha.html5.core.Cube.call(this, scene, centerPosition, w, h, id);
-	this.r = 5;
+org.xiha.html5.core.Arccube = function(scene, centerPosition, w, h) {
+	org.xiha.html5.core.Cube.call(this, scene, centerPosition, w, h);
+	this._DEFAULT_R = 5;
+	this.r = this._DEFAULT_R;
+	this.renderableText = null;
+
 	this.render = function() {
 
 		var ctx = this.getContext();
 		ctx.beginPath();
 		ctx.fillStyle = this.fillStyle;
-		var rec = this.ccRect(this.centerPosition, this.w, this.h, this.r);
+		// var rec = this.ccRect(this.centerPosition, this.w, this.h, this.r);
 
-		ctx.arc(rec.c1.x, rec.c1.y, this.r, Math.PI, 1.5 * Math.PI, false);
-		ctx.arc(rec.c2.x, rec.c2.y, this.r, 1.5 * Math.PI, 2 * Math.PI, false);
-		ctx.arc(rec.c3.x, rec.c3.y, this.r, 0, 0.5 * Math.PI, false);
-		ctx.arc(rec.c4.x, rec.c4.y, this.r, 0.5 * Math.PI, Math.PI, false);
-		console.log(this.centerPosition.getX());
-		
-		//ctx.lineWidth = 5 ;
-		//ctx.strokeStyle = 'black';
-		
-		//ctx.stroke();
-		
-		//ctx.arc(this.centerPosition.getX(), this.centerPosition.getY(), 20, 0, 2 * Math.PI, false);
+		// ctx.arc(rec.c1.x, rec.c1.y, this.r, Math.PI, 1.5 * Math.PI, false);
+		// ctx.arc(rec.c2.x, rec.c2.y, this.r, 1.5 * Math.PI, 2 * Math.PI,
+		// false);
+		// ctx.arc(rec.c3.x, rec.c3.y, this.r, 0, 0.5 * Math.PI, false);
+		// ctx.arc(rec.c4.x, rec.c4.y, this.r, 0.5 * Math.PI, Math.PI, false);
+		// 圆弧矩形算法
+		var x = this.centerPosition.getX();
+		var y = this.centerPosition.getY();
+		ctx.moveTo(x - (w / 2) + this.r, y - (h / 2));
+		ctx.lineTo(x + (w / 2) - this.r, y - (h / 2));
+		ctx.arcTo(x + (w / 2), y - (h / 2), x + (w / 2), y - (h / 2) + this.r,
+				this.r);
+		ctx.lineTo(x + (w / 2), y + (h / 2) - this.r);
+		ctx.arcTo(x + (w / 2), y + (h / 2), x + (w / 2) - this.r, y + (h / 2),
+				this.r);
+		ctx.lineTo(x - (w / 2) + this.r, y + (h / 2));
+		ctx.arcTo(x - (w / 2), y + (h / 2), x - (w / 2), y + (h / 2) - this.r,
+				this.r);
+		ctx.arcTo(x - (w / 2), y - (h / 2) + this.r);
+		ctx.arcTo(x - (w / 2), y - (h / 2), x - (w / 2) + this.r, y - (h / 2),
+				this.r);
+
 		ctx.closePath();
 		ctx.fill();
-		//ctx.stroke();
+		if (this.renderableText != null) {
+			ctx.fillStyle = this.renderableText.fillStyle();
+			ctx.font = this.renderableText.font();
+			ctx.textAlign = "center";
+			ctx.textBaseline = "middle";
+			ctx.fillText(this.renderableText.text(), x, y);
+		}
+
 	};
 
 	this.ccRect = function(position, w, h, r) {

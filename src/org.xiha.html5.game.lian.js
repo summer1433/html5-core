@@ -31,7 +31,7 @@ org.xiha.html5.game.lian.Poker.prototype.destroy = function() {
 };
 org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 		images) {
-
+	scene.enableMultiSelect();
 	var pw = 50;
 	var ph = 50;
 	var psx1 = normalPoint.getX() - (pw * (wsize / 2));
@@ -88,6 +88,7 @@ org.xiha.html5.game.lian.Pokers = function(scene, normalPoint, wsize, hsize,
 			poker.image = pokerImages[i * wsize + j];
 			poker.setFillStyle('#ffffff');
 			poker.clickEnable = true;
+			poker.addClickAbility();
 			// poker.canRenderme();
 			ho.push(poker);
 		}

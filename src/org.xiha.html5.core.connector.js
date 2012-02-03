@@ -1,15 +1,42 @@
 request('org.xiha.html5.core');
 request('org.xiha.html5.core.scene');
 
-org.xiha.html5.core.Connector = function(scene, cube1, cube2, strokeStyle,
-		fillStyle, lineWidth) {
-	this.scene = scene;
+org.xiha.html5.core.ConnectorUtil = function() {
+	this.bindingConnector = function(cube1, cube2, strokeStyle, fillStyle,
+			lineWidth) {
+		var renderAble = org.xiha.html5.core.scene.renderAble;
+		var isExist = false;
+		for ( var i = 0; i < renderAble.length; i++) {
+			var cnn = renderAble[i];
+
+			if (cnn instanceof org.xiha.html5.core.Connector) {
+				if ((cnn.cube1.id == cube1.id && cnn.cube2.id == cube2.id)
+						|| (cnn.cube1.id == cube2.id && cnn.cube2.id == cube1.id)) {
+					isExist = true;
+					//console.log("connector already exist, connector is:");
+					//console.log(cnn);
+					break;
+				}
+			}
+		}
+		if (!isExist) {
+			new org.xiha.html5.core.Connector(cube1, cube2, strokeStyle,
+					fillStyle, lineWidth);
+		}
+	};
+};
+
+org.xiha.html5.core.Connector = function(cube1, cube2, strokeStyle, fillStyle,
+		lineWidth) {
+	this.id = null;
+	this.scene = org.xiha.html5.core.scene;
 	this.cube1 = cube1;
 	this.cube2 = cube2;
 	this.strokeStyle = strokeStyle;
 	this.fillStyle = fillStyle;
 	this.lineWidth = lineWidth;
 	this.renderme = false;
+
 	scene.addRenderable(this);
 };
 
@@ -56,34 +83,37 @@ org.xiha.html5.core.Connector.prototype = {
 		var b = Math.atan(h / w);
 		var xi = c1.getX();
 		var yi = c1.getY();
-		if ((a > 0 && a < b) || a < 0 && a > -b) {
-			console.log("debug 1");
+		if ((a >= 0 && a <= b) || a < 0 && a >= -b) {
+			// console.log("debug 1");
 
 			return {
 				x : xi + (w / 2),
 				y : yi + (w * Math.tan(a) / 2)
 			};
-		} else if ((a > Math.PI - b && a < Math.PI)
-				|| (a > -Math.PI && a < -Math.PI + b)) {
-			console.log("debug 2");
+		} else if ((a >= Math.PI - b && a <= Math.PI)
+				|| (a >= -Math.PI && a <= -Math.PI + b)) {
+			// console.log("debug 2");
 
 			return {
 				x : xi - (w / 2),
 				y : yi - (w * Math.tan(a) / 2)
 			};
 		} else if (a > b && a < Math.PI - b) {
-			console.log("debug 3");
+			// console.log("debug 3");
 
 			return {
 				x : xi + h / (2 * Math.tan(a)),
 				y : yi + h / 2
 			};
 		} else if (a < -b && a > -Math.PI + b) {
-			console.log("debug 4");
+			// console.log("debug 4");
 			return {
 				x : xi - h / (2 * Math.tan(a)),
 				y : yi - h / 2
 			};
+		} else {
+			console.log(a);
+			console.log(b);
 		}
 
 	},

@@ -1,15 +1,20 @@
 org.xiha.html5.core.Scene = function(canvas, id) {
 	var self = this;
 	this.id = id;
+	this.objectIdSequence = 0;
+	this.objectMap = {};
 	this.renderAble = new Array();
+
+	this.eventPool = new org.xiha.html5.core.EventPool(100, self);
 	this.canvas = canvas;
+
 	this.sos = new Array();// selected objects
 	this.isMultiSelect = false;
 	this.allRender = true;
 	this.rootNode = null;
 	this.nodeUtil = null;
-	this.setRootNode = function(node, nodeUtil) {
-		this.nodeUtil = nodeUtil;
+
+	this.setRootNode = function(node) {
 		this.rootNode = node;
 	};
 	this.getWidth = function() {
@@ -25,15 +30,28 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	};
 
 	this.addRenderable = function(o) {
-		this.renderAble.push(o);
+		this.objectIdSequence++;
+
+		if (o.id == null) {
+			o.id = this.objectIdSequence;
+			this.objectMap[this.objectIdSequence] = o;
+			this.renderAble.push(o);
+		} else if (o.id >= 0) {
+			if (this.objectMap[this.objectIdSequence] == null) {
+				this.objectMap[this.objectIdSequence] = o;
+				this.renderAble.push(o);
+
+			} else {
+				console.log("object already exist, object is:");
+				console.log(o);
+			}
+
+		}
+
 	};
 
-	this.canvas.addEventListener('click', function() {
-
-		// this.allRender = true;
-
-	}, false);
-
+	// 定义全局可见
+	window.org.xiha.html5.core.scene = self;
 };
 org.xiha.html5.core.Scene.prototype = {
 
@@ -104,14 +122,9 @@ org.xiha.html5.core.Scene.prototype = {
 			} else if (this.sos.length == 1) {
 
 				var selected = this.sos.pop();
-				if (selected.id < o.id) {
-					selected.inSelect = false;
-					// selected.removeMouseMoveEvent();
-					o.inSelect = true;
-					this.sos.push(o);
-				} else {
-					this.sos.push(selected);
-				}
+				selected.inSelect = false;
+				o.inSelect = true;
+				this.sos.push(o);
 			}
 		}
 
