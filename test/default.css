@@ -1,0 +1,15 @@
+#eee1  {
+	color: black;
+	background-color: #d4d144;
+	height: 24px;
+	text-indent: 2px;
+	font: 12px/29px sans-serif;
+	margin: 2px 0 0 1px;
+	width: 46px;
+	border: 1px dotted #ffffff;
+	padding-top: 0;
+	padding-bottom: 0;
+	padding-right: 0;
+	text-align: center;
+}
+

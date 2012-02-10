@@ -1,7 +1,7 @@
 request('org.xiha.html5.core');
 
-org.xiha.html5.core.Arccube = function(scene, centerPosition, w, h) {
-	org.xiha.html5.core.Cube.call(this, scene, centerPosition, w, h);
+org.xiha.html5.core.Arccube = function(centerPosition, w, h) {
+	org.xiha.html5.core.Cube.call(this, centerPosition, w, h);
 	this._DEFAULT_R = 5;
 	this.r = this._DEFAULT_R;
 	this.renderableText = null;
@@ -31,7 +31,7 @@ org.xiha.html5.core.Arccube = function(scene, centerPosition, w, h) {
 		ctx.lineTo(x - (w / 2) + this.r, y + (h / 2));
 		ctx.arcTo(x - (w / 2), y + (h / 2), x - (w / 2), y + (h / 2) - this.r,
 				this.r);
-		ctx.arcTo(x - (w / 2), y - (h / 2) + this.r);
+		ctx.lineTo(x - (w / 2), y - (h / 2) + this.r);
 		ctx.arcTo(x - (w / 2), y - (h / 2), x - (w / 2) + this.r, y - (h / 2),
 				this.r);
 
@@ -70,8 +70,32 @@ org.xiha.html5.core.Arccube = function(scene, centerPosition, w, h) {
 		};
 	};
 
+	this.editorAble = function() {
+		var self = this;
+		var mdca = function(ev) {
+			self.mouseDoubleClickAction(ev);
+		};
+		self.getCanvas().addEventListener('dblclick', mdca, false);
+		;
+	};
+
 };
 
 org.xiha.html5.util.extend(org.xiha.html5.core.Arccube,
 		org.xiha.html5.core.Cube);// 继承关系
 
+org.xiha.html5.core.Arccube.prototype.mouseDoubleClickAction = function(ev) {
+	var self = this;
+	var evt = window.event || arguments[0];
+
+	var mouse = org.xiha.html5.util.getMouse(evt, this.getCanvas());
+	if (self.isOver(mouse)) {
+		self.scene.select(self);
+		self.scene.eventPool
+				.addNewEvent(new org.xiha.html5.core.Event(
+						(new org.xiha.html5.core.Constants()).DOUBLE_CLICK_EVENT,
+						self));
+
+	}
+
+};

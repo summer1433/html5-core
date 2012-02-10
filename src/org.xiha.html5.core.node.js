@@ -76,29 +76,32 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 	// 从根开始遍历结点
 
 	this.ergod = function(root) {
-		if (root.childs != null) {
-			if (root.obj instanceof org.xiha.html5.core.Cube) {
-				if (root.parent == null && root.obj.centerPosition == null) {
-					var x = Math.floor(root.obj.scene.getWidth() / 2);
-					var y = Math.floor(root.obj.scene.getHeight() / 2);
+		
+		if (root.obj instanceof org.xiha.html5.core.Cube) {
+			if (root.parent == null && root.obj.centerPosition == null) {
+				var x = Math.floor(root.obj.scene.getWidth() / 2);
+				var y = Math.floor(root.obj.scene.getHeight() / 2);
+				root.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
+						x, y);
+				// console.log("root,X:"+x+",Y:"+y);
+			} else {
+				// console.log(root.radian);
+				if (root.radian != null && root.childs != null) {
+					// 延长子结点连接线
+					var Xi = Math.floor(root.obj.centerPosition.getX()
+							- (this.radius * 0.618) * Math.cos(cnode.radian));
+					var Yi = Math.floor(root.obj.centerPosition.getY()
+							+ (this.radius * 0.618) * Math.sin(cnode.radian));
 					root.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
-							x, y);
-					// console.log("root,X:"+x+",Y:"+y);
-				} else {
-					// console.log(root.radian);
-					if (root.radian != null && root.childs != null) {
-						// 延长子结点连接线
-						var Xi = Math.floor(root.obj.centerPosition.getX()
-								- (this.radius * 0.618) * Math.cos(cnode.radian));
-						var Yi = Math.floor(root.obj.centerPosition.getY()
-								+ (this.radius * 0.618) * Math.sin(cnode.radian));
-						root.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
-								Xi, Yi);
-					}
-
+							Xi, Yi);
 				}
 
 			}
+
+		}
+		
+		if (root.childs != null) {
+			
 
 			// console.log(root.node + "has child");
 			var childn = root.childs;

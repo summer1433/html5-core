@@ -34,6 +34,7 @@ org.xiha.html5.core.RenderableText = function(text, fillStyle, font) {
 
 org.xiha.html5.core.Constants = function() {
 	this.CLICK_EVENT = 'CLICK_EVENT';
+	this.DOUBLE_CLICK_EVENT = 'DOUBLE_CLICK_EVENT';
 };
 
 org.xiha.html5.core.Event = function(msg, object) {
@@ -51,7 +52,7 @@ org.xiha.html5.core.EventPool = function(maxsize, scene) {
 	} else {
 		this.maxsize = maxsize;
 	}
-	//console.log('event pool init,maxsize:' + this.maxsize);
+	// console.log('event pool init,maxsize:' + this.maxsize);
 	this.getRecentEvent = function() {
 		var len = this.events.length;
 		if (len != 0)
@@ -63,14 +64,14 @@ org.xiha.html5.core.EventPool = function(maxsize, scene) {
 
 		while (this.events.length >= this.maxsize) {
 			this.events.shift();
-			//console.log("event pool full,shift some old event");
+			// console.log("event pool full,shift some old event");
 		}
 
 		var listeners = this.scene.renderAble;
 		for ( var i = 0; i < listeners.length; i++) {
 			if (listeners[i].listenEvent != null) {
 				listeners[i].listenEvent();
-				//console.log(listeners[i]);
+				// console.log(listeners[i]);
 			}
 		}
 

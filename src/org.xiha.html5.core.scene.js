@@ -64,12 +64,6 @@ org.xiha.html5.core.Scene.prototype = {
 	},
 
 	allReady : function() {
-		console.log('renderall o');
-		for ( var i = 0; i < this.renderAble.length; i++) {
-			this.renderAble[i].canRenderme();
-
-			// this.renderAble[i].ready();
-		}
 
 		var self = this;
 
@@ -82,8 +76,8 @@ org.xiha.html5.core.Scene.prototype = {
 				self.clearScene();
 				// self.nodeUtil.ergod(self.rootNode);
 				for ( var i = 0; i < self.renderAble.length; i++) {
-
-					self.renderAble[i].render();
+					if (self.renderAble[i].render != null)
+						self.renderAble[i].render();
 
 				}
 
