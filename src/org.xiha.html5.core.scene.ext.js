@@ -16,7 +16,7 @@ org.xiha.html5.core.Scene.prototype.gravity = function(g) {
 
 					if (y < finalY) {
 						o.timer = o.timer + t;
-						y = y + (g * t * o.timer + g * t * t / 2)/1000;
+						y = y + (g * t * o.timer + g * t * t / 2) / 1000;
 						o.addTrack(new org.xiha.html5.core.NormalPoint(x, y));
 						renderAll = true;
 
@@ -28,6 +28,16 @@ org.xiha.html5.core.Scene.prototype.gravity = function(g) {
 		}
 		if (renderAll)
 			self.allRender = true;
+
+	}, t);
+
+};
+
+org.xiha.html5.core.Scene.prototype.forceBalance = function(t) {
+	var self = this;
+	setInterval(function() {
+		window.org.xiha.html5.core.nodeUtil.forceBalance();
+		self.allRender = true;
 
 	}, t);
 

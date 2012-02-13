@@ -10,19 +10,28 @@ org.xiha.html5.core.input.Editor = function(editorId) {
 		writeEditor.style.position = "absolute";
 		writeEditor.style.left = np.getX() + "px";
 		writeEditor.style.top = np.getY() + "px";
-		if(this.object.renderableText!=null) {
+		if (this.object.renderableText != null) {
 			writeEditor.innerText = this.object.renderableText.text();
-		}else{
+		} else {
 			writeEditor.innerText = '';
 		}
 		writeEditor.style.display = "";
 		writeEditor.focus();
-		writeEditor.object = this.object;
+		writeEditor.bindEditor = this;
 		writeEditor.onblur = function() {
 			this.style.display = "none";
-			this.object.renderableText = new org.xiha.html5.core.RenderableText(this.innerText,"black","12px/29px sans-serif");
+			if (this.bindEditor.change != null) {
+				var oldText = this.bindEditor.object.renderableText.text();
+				var newRenderText = new org.xiha.html5.core.RenderableText(
+						this.innerText, "black", "12px/29px sans-serif");
+				var newText = newRenderText.text();
+				if (this.bindEditor.change(oldText, newText)) {
+					this.bindEditor.object.renderableText = newRenderText;
+
+				}
+			}
 		};
-		//document.getElementById(this.editorId + "_input").focus();
+		// document.getElementById(this.editorId + "_input").focus();
 
 	};
 	this.scene.addRenderable(this);
@@ -37,10 +46,8 @@ org.xiha.html5.core.input.Editor.prototype.listenEvent = function() {
 		var top = org.xiha.html5.util.getTrueOffsetTop(this.scene.canvas);
 		if (e.object.w != null) {
 			// 反向计算div绝对位置
-			x = e.object.getCenterPosition().getX() - (e.object.w / 2) + left
-					;
-			y = e.object.getCenterPosition().getY() - (e.object.h / 2) + top
-					;
+			x = e.object.getCenterPosition().getX() - (e.object.w / 2) + left;
+			y = e.object.getCenterPosition().getY() - (e.object.h / 2) + top;
 		}
 		var np = new org.xiha.html5.core.NormalPoint(x, y);
 		this.display(np);

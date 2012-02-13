@@ -48,6 +48,7 @@
 			canvas.height = window.innerHeight;
 		}
 		var scene = new org.xiha.html5.core.Scene(canvas, 1);
+        new org.xiha.html5.core.NodeUtil(100);
 
 		var maxnum = 5;
 
@@ -98,7 +99,7 @@
 
 			var node_i = new org.xiha.html5.core.Node(cube_i, o, null);
 
-			window.org.xiha.html5.core.scene.nodeUtil
+			window.org.xiha.html5.core.nodeUtil
 					.ergod(window.org.xiha.html5.core.scene.rootNode);
 			window.org.xiha.html5.core.scene.clearScene();
 		}
@@ -108,7 +109,9 @@
 		var cube2 = createCube();
 		var cube3 = createCube();
 		var cube4 = createCube();
+		
 		var cube5 = createCube();
+		/*
 		var cube6 = createCube();
 
 		var cube7 = createCube();
@@ -117,30 +120,30 @@
 		var cube10 = createCube();
 		var cube11 = createCube();
 		var cube12 = createCube();
-		var cube13 = createCube();
+		var cube13 = createCube(); */
 		//开始构造结点以及关联关系
 		var node = new org.xiha.html5.core.Node(cube1, null, null);
 		scene.setRootNode(node);
 
 		new org.xiha.html5.core.Node(cube2, cube1, null);
-		new org.xiha.html5.core.Node(cube10, cube2, null);
+		/* new org.xiha.html5.core.Node(cube10, cube2, null);
 		new org.xiha.html5.core.Node(cube11, cube2, null);
 		new org.xiha.html5.core.Node(cube12, cube2, null);
-		new org.xiha.html5.core.Node(cube13, cube2, null);
+		new org.xiha.html5.core.Node(cube13, cube2, null); */
 
 		new org.xiha.html5.core.Node(cube3, cube1, null);
 		new org.xiha.html5.core.Node(cube4, cube1, null);
 		new org.xiha.html5.core.Node(cube5, cube1, null);
 
-		new org.xiha.html5.core.Node(cube6, cube1, null);
-		new org.xiha.html5.core.Node(cube7, cube6, null);
-		new org.xiha.html5.core.Node(cube8, cube6, null);
-		new org.xiha.html5.core.Node(cube9, cube6, null);
+		//new org.xiha.html5.core.Node(cube6, cube1, null);
+		//new org.xiha.html5.core.Node(cube7, cube6, null);
+		//new org.xiha.html5.core.Node(cube8, cube6, null);
+		//new org.xiha.html5.core.Node(cube9, cube6, null);
 
 		new org.xiha.html5.core.input.Editor("eee1");
 
-		scene.nodeUtil = new org.xiha.html5.core.NodeUtil(100);
 		scene.ready();
+		scene.forceBalance(60);
 		//scene.gravity(2);
 		function createCube() {
 

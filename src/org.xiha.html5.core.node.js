@@ -5,6 +5,7 @@ org.xiha.html5.core.Node = function(obj, parentObj, childs) {
 	this.parent = parentObj;
 	this.childs = childs;
 	this.radian = null;
+	this.id = null;
 
 	this.addChild = function(child) {
 		if (this.childs == null) {
@@ -23,7 +24,7 @@ org.xiha.html5.core.Node = function(obj, parentObj, childs) {
 
 	var nodeAutoUtil = new org.xiha.html5.core.NodeAutoUtil();
 	nodeAutoUtil.autoAddToRoot(window.org.xiha.html5.core.scene.rootNode, this);
-
+	window.org.xiha.html5.core.nodeUtil.addNode(this);
 };
 
 org.xiha.html5.core.NodeAutoUtil = function() {
@@ -69,14 +70,115 @@ org.xiha.html5.core.NodeAutoUtil = function() {
 	};
 };
 
+org.xiha.html5.core.force = function(f, radian) {
+	this.f = f;
+	this.radian = radian;
+};
+
 org.xiha.html5.core.NodeUtil = function(radius) {
+	this.nodeIdSequence = 0;
+	this.nodesMap = {};
+	this.nodes = new Array();
 	// this.matchedNodes = new Array();
 	this.connectorUtil = new org.xiha.html5.core.ConnectorUtil();
 	this.radius = radius;
+	this.kPush = 1;
+	this.kPull = 0.02;
+	this.minLen = 80;
 	// 从根开始遍历结点
+	this.genPushForce = function(beginPoint, endPoint) {
+		var radian = Math.atan((endPoint.getY() - beginPoint.getY())
+				/ (endPoint.getX() - beginPoint.getX()));
+		var f = this.kPush
+				* (100 / ((endPoint.getY() - beginPoint.getY()) / Math
+						.sin(radian)));
+		return new org.xiha.html5.core.force(f, radian);
+	};
+
+	this.genPullForce = function(beginPoint, endPoint) {
+		var radian = Math.atan((endPoint.getY() - beginPoint.getY())
+				/ (endPoint.getX() - beginPoint.getX()));
+		var len = (endPoint.getY() - beginPoint.getY()) / Math.sin(radian);
+		var f = 0;
+		if (Math.abs(len) > this.minLen) {
+			f = this.kPull * len;
+		}
+		return new org.xiha.html5.core.force(f, radian);
+	};
+
+	this.addForce = function(f1, f2) {
+		var radian = Math.atan((Math.sin(f1.radian) * f1.f + Math
+				.sin(f2.radian)
+				* f2.f)
+				/ (Math.cos(f1.radian) * f1.f + Math.cos(f2.radian) * f2.f));
+		var f = (Math.sin(f1.radian) * f1.f + Math.sin(f2.radian) * f2.f)
+				/ Math.sin(radian);
+		return new org.xiha.html5.core.force(f, radian);
+
+	};
+
+	this.forceBalance = function() {
+
+		for ( var i = 0; i < this.nodes.length; i++) {
+			var forceNode = this.nodes[i];
+			var f0 = new org.xiha.html5.core.force(0, 0);
+			//console.log('开始计算nodeid:' + forceNode.id + '的受力');
+			if (forceNode.id != 1) {
+				for ( var j = 0; j < this.nodes.length; j++) {
+					if (forceNode.id != this.nodes[j].id) {
+						var tmpf = this.genPushForce(
+								this.nodes[j].obj.centerPosition,
+								forceNode.obj.centerPosition);
+						var c = tmpf.radian / 0.017453293;
+//						console.log('受到nodeid:[' + this.nodes[j].id + ']的力,角度'
+//								+ c + ',大小[' + tmpf.f + ']');
+						f0 = this.addForce(tmpf, f0);
+						var c0 = f0.radian / 0.017453293;
+						//console.log('合并后合力为[' + c0 + '],大小为[' + f0.f + ']');
+					}
+				}
+			}
+			if (forceNode.parent != null) {
+				var f1 = this.genPullForce(forceNode.obj.centerPosition,
+						forceNode.parent.centerPosition);
+				var c1 = f1.radian / 0.017453293;
+				//console.log('拉力f1['+c1+'],大小为['+f1.f+']');
+				f0 = this.addForce(f1, f0);
+			}
+			// console.log(f0);
+			var c0 = f0.radian / 0.017453293;
+			 //console.log('最终合并合力为[' + c0 + '],大小为[' + f0.f + ']');
+			var x = Math.abs(forceNode.obj.centerPosition.getX() + f0.f
+					* Math.cos(f0.radian));
+			var y = Math.abs(forceNode.obj.centerPosition.getY() + f0.f
+					* Math.sin(f0.radian));
+			forceNode.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
+					x, y);
+		}
+
+	};
+
+	this.addNode = function(node) {
+		this.nodeIdSequence++;
+
+		if (node.id == null) {
+			node.id = this.nodeIdSequence;
+			this.nodesMap[this.nodeIdSequence] = node;
+			this.nodes.push(node);
+		} else if (node.id >= 0) {
+			if (this.nodesMap[node.id] == null) {
+				this.nodesMap[node.id] = node;
+				this.nodes.push(node);
+			} else {
+				console.log("node already exist, node is:");
+				console.log(node);
+			}
+		}
+
+	};
 
 	this.ergod = function(root) {
-		
+
 		if (root.obj instanceof org.xiha.html5.core.Cube) {
 			if (root.parent == null && root.obj.centerPosition == null) {
 				var x = Math.floor(root.obj.scene.getWidth() / 2);
@@ -99,9 +201,8 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 			}
 
 		}
-		
+
 		if (root.childs != null) {
-			
 
 			// console.log(root.node + "has child");
 			var childn = root.childs;
@@ -132,5 +233,6 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 		}
 
 	};
+	window.org.xiha.html5.core.nodeUtil = this;
 
 };

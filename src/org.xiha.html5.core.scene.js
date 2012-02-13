@@ -12,7 +12,6 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.isMultiSelect = false;
 	this.allRender = true;
 	this.rootNode = null;
-	this.nodeUtil = null;
 
 	this.setRootNode = function(node) {
 		this.rootNode = node;
@@ -37,8 +36,8 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 			this.objectMap[this.objectIdSequence] = o;
 			this.renderAble.push(o);
 		} else if (o.id >= 0) {
-			if (this.objectMap[this.objectIdSequence] == null) {
-				this.objectMap[this.objectIdSequence] = o;
+			if (this.objectMap[o.id] == null) {
+				this.objectMap[o.id] = o;
 				this.renderAble.push(o);
 
 			} else {
@@ -58,7 +57,7 @@ org.xiha.html5.core.Scene.prototype = {
 	ready : function() {
 		var self = this;
 		if (self.rootNode != null) {
-			this.nodeUtil.ergod(this.rootNode);
+			window.org.xiha.html5.core.nodeUtil.ergod(this.rootNode);
 		}
 		self.allReady();
 	},
@@ -83,7 +82,7 @@ org.xiha.html5.core.Scene.prototype = {
 
 				self.allRender = false;
 			}
-
+			
 			//
 
 		}, 1);
