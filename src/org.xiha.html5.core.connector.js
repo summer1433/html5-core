@@ -58,6 +58,12 @@ org.xiha.html5.core.Connector.prototype = {
 		ctx.beginPath();
 		var c1 = this.cube1.centerPosition;
 		var c2 = this.cube2.centerPosition;
+		if(c1==null) {
+			console.log("error cubeid ["+this.cube1.id+"] cp is null");
+		}
+		if(c2==null) {
+			console.log("error cubeid ["+this.cube2.id+"] cp is null");
+		}
 		var xy1 = this.cal(c1, c2, this.cube1.w, this.cube1.h);
 		var xy2 = this.cal(c2, c1, this.cube2.w, this.cube2.h);
 
@@ -119,3 +125,5 @@ org.xiha.html5.core.Connector.prototype = {
 	},
 
 };
+
+window.org.xiha.html5.core.connectorUtil = new org.xiha.html5.core.ConnectorUtil();

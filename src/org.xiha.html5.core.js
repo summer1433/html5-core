@@ -3,6 +3,8 @@ request('org.xiha.html5.util');
 org.xiha.html5.core = {};
 
 org.xiha.html5.core.NormalPoint = function(x, y) {
+	this.x = x;
+	this.y = y;
 	this.point = {
 		'x' : x,
 		'y' : y

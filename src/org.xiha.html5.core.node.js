@@ -1,9 +1,9 @@
 request('org.xiha.html5.util');
 
-org.xiha.html5.core.Node = function(obj, parentObj, childs) {
+org.xiha.html5.core.Node = function(obj, parentObj) {
 	this.obj = obj;
 	this.parent = parentObj;
-	this.childs = childs;
+	this.childs = null;
 	this.radian = null;
 	this.id = null;
 
@@ -21,7 +21,10 @@ org.xiha.html5.core.Node = function(obj, parentObj, childs) {
 	if (window.org.xiha.html5.core.scene.rootNode == null) {
 		window.org.xiha.html5.core.scene.setRootNode(this);
 	}
-
+	if (parentObj != null) {
+		window.org.xiha.html5.core.connectorUtil.bindingConnector(obj,
+				parentObj, '#121011', '#121011', 1);
+	}
 	var nodeAutoUtil = new org.xiha.html5.core.NodeAutoUtil();
 	nodeAutoUtil.autoAddToRoot(window.org.xiha.html5.core.scene.rootNode, this);
 	window.org.xiha.html5.core.nodeUtil.addNode(this);
@@ -76,6 +79,7 @@ org.xiha.html5.core.force = function(f, radian) {
 };
 
 org.xiha.html5.core.NodeUtil = function(radius) {
+	this.isfb = true;
 	this.nodeIdSequence = 0;
 	this.nodesMap = {};
 	this.nodes = new Array();
@@ -84,77 +88,156 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 	this.radius = radius;
 	this.kPush = 1;
 	this.kPull = 0.02;
-	this.minLen = 80;
+	this.minLen = 60;
 	// 从根开始遍历结点
 	this.genPushForce = function(beginPoint, endPoint) {
-		var radian = Math.atan((endPoint.getY() - beginPoint.getY())
-				/ (endPoint.getX() - beginPoint.getX()));
-		var f = this.kPush
-				* (100 / ((endPoint.getY() - beginPoint.getY()) / Math
-						.sin(radian)));
+		var a = endPoint.getY() - beginPoint.getY();
+		var b = endPoint.getX() - beginPoint.getX();
+		if (b == 0) {
+			b = 0.0001;
+		}
+		if (a == 0) {
+			a = 0.0001;
+		}
+		// 保证被除数不为0
+
+		var radian = Math.atan(a / b);
+
+		if (a > 0 && b < 0) {
+			radian = radian + Math.PI;
+		} else if (a < 0 && b < 0) {
+			radian = -Math.PI + radian;
+
+		}
+
+		var f = this.kPush * (100 / (a / Math.sin(radian)));
 		return new org.xiha.html5.core.force(f, radian);
 	};
 
 	this.genPullForce = function(beginPoint, endPoint) {
-		var radian = Math.atan((endPoint.getY() - beginPoint.getY())
-				/ (endPoint.getX() - beginPoint.getX()));
-		var len = (endPoint.getY() - beginPoint.getY()) / Math.sin(radian);
-		var f = 0;
-		if (Math.abs(len) > this.minLen) {
-			f = this.kPull * len;
+		var a = endPoint.getY() - beginPoint.getY();
+		var b = endPoint.getX() - beginPoint.getX();
+		if (b == 0) {
+			b = 0.0001;
 		}
+		// if (a == 0) {
+		// a = 0.0001;
+		// }
+		// 保证被除数不为0
+		var radian = Math.atan(a / b);
+
+		if (a > 0 && b < 0) {
+			radian = radian + Math.PI;
+		} else if (a < 0 && b < 0) {
+			// console.log('-----');
+			radian = -Math.PI + radian;
+		}
+
+		var len = a / Math.sin(radian);
+		var f = 0;
+		if (len < 0) {
+			console.log('len <0,' + len);
+		}
+		f = this.kPull * (Math.abs(len) - this.minLen);
+
+		// if (Math.abs(len) > this.minLen) {
+		//
+		//
+		// } else if (Math.abs(len) < this.minLen) {
+		// f = -this.kPull * (this.minLen-Math.abs(len) );
+		//
+		// } else if (Math.abs(len) == this.minLen) {
+		// f = 0;
+		// }
 		return new org.xiha.html5.core.force(f, radian);
 	};
 
 	this.addForce = function(f1, f2) {
-		var radian = Math.atan((Math.sin(f1.radian) * f1.f + Math
-				.sin(f2.radian)
-				* f2.f)
-				/ (Math.cos(f1.radian) * f1.f + Math.cos(f2.radian) * f2.f));
-		var f = (Math.sin(f1.radian) * f1.f + Math.sin(f2.radian) * f2.f)
-				/ Math.sin(radian);
-		return new org.xiha.html5.core.force(f, radian);
+		var a = Math.sin(f1.radian) * f1.f + Math.sin(f2.radian) * f2.f;
+		var b = Math.cos(f1.radian) * f1.f + Math.cos(f2.radian) * f2.f;
+		if (b == 0) {
+			b = 0.0001;
+		}
+		// if (a == 0) {
+		// a = 0.0001;
+		// }
+		var radian = Math.atan(a / b);
+		if (a > 0 && b < 0) {
+			radian = radian + Math.PI;
+		} else if (a < 0 && b < 0) {
+			radian = -Math.PI + radian;
+		}
+		var forceHe = 0;
+		if (Math.sin(radian) != 0) {
+			forceHe = a / Math.sin(radian);
+		}
+		return new org.xiha.html5.core.force(forceHe, radian);
 
 	};
 
 	this.forceBalance = function() {
-
-		for ( var i = 0; i < this.nodes.length; i++) {
-			var forceNode = this.nodes[i];
-			var f0 = new org.xiha.html5.core.force(0, 0);
-			//console.log('开始计算nodeid:' + forceNode.id + '的受力');
-			if (forceNode.id != 1) {
-				for ( var j = 0; j < this.nodes.length; j++) {
-					if (forceNode.id != this.nodes[j].id) {
-						var tmpf = this.genPushForce(
-								this.nodes[j].obj.centerPosition,
-								forceNode.obj.centerPosition);
-						var c = tmpf.radian / 0.017453293;
-//						console.log('受到nodeid:[' + this.nodes[j].id + ']的力,角度'
-//								+ c + ',大小[' + tmpf.f + ']');
-						f0 = this.addForce(tmpf, f0);
-						var c0 = f0.radian / 0.017453293;
-						//console.log('合并后合力为[' + c0 + '],大小为[' + f0.f + ']');
+		if (this.isfb)
+			for ( var i = 0; i < this.nodes.length; i++) {
+				var nn = 0;
+				var forceNode = this.nodes[i];
+				var fn = new org.xiha.html5.core.force(0, 0);
+				var f0 = new org.xiha.html5.core.force(0, 0);
+				// console.log('开始计算nodeid:' + forceNode.id + '的受力');
+				if (forceNode.id != 1) {
+					for ( var j = 0; j < this.nodes.length; j++) {
+						if (forceNode.id != this.nodes[j].id) {
+							nn++;
+							var tmpf0 = this.genPushForce(
+									this.nodes[j].obj.centerPosition,
+									forceNode.obj.centerPosition);
+							// var c = tmpf.radian / 0.017453293;
+							// console.log('受到nodeid:[' + this.nodes[j].id +
+							// ']的力,角度'
+							// + c + ',大小[' + tmpf.f + ']');
+							f0 = this.addForce(tmpf0, f0);
+							// var c0 = f0.radian / 0.017453293;
+							// console.log('合并后合力为[' + c0 + '],大小为[' + f0.f +
+							// ']');
+						}
 					}
 				}
+				console.log(forceNode.id + '受到' + nn + '个推力，合力=');
+				console.log(f0);
+				var f1 = new org.xiha.html5.core.force(0, 0);
+				if (forceNode.parent != null) {
+					f1 = this.genPullForce(forceNode.obj.centerPosition,
+							forceNode.parent.centerPosition);
+					// var c1 = f1.radian / 0.017453293;
+					// console.log('拉力f1['+c1+'],大小为['+f1.f+']');
+					// if (forceNode.childs != null) {
+					// for ( var m = 0; m < forceNode.childs.length; m++) {
+					// var tmpchild = forceNode.childs[m];
+					// var tmpf1 = this.genPullForce(
+					// tmpchild.obj.centerPosition,
+					// forceNode.parent.centerPosition);
+					//						
+					// f1 = this.addForce(tmpf1, f1);
+					// }
+					// this.genPullForce(forceNode.obj.centerPosition,
+					// forceNode.parent.centerPosition);
+					// }
+
+					console.log(forceNode.id + '受到1个推力，合力=');
+					console.log(f1);
+
+				}
+				fn = this.addForce(f1, f0);
+
+				// console.log(f2);
+				// var c0 = f2.radian / 0.017453293;
+				// console.log('最终合并合力为[' + c0 + '],大小为[' + f0.f + ']');
+				var x = forceNode.obj.centerPosition.getX() + fn.f
+						* Math.cos(fn.radian);
+				var y = forceNode.obj.centerPosition.getY() + fn.f
+						* Math.sin(fn.radian);
+				forceNode.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
+						x, y);
 			}
-			if (forceNode.parent != null) {
-				var f1 = this.genPullForce(forceNode.obj.centerPosition,
-						forceNode.parent.centerPosition);
-				var c1 = f1.radian / 0.017453293;
-				//console.log('拉力f1['+c1+'],大小为['+f1.f+']');
-				f0 = this.addForce(f1, f0);
-			}
-			// console.log(f0);
-			var c0 = f0.radian / 0.017453293;
-			 //console.log('最终合并合力为[' + c0 + '],大小为[' + f0.f + ']');
-			var x = Math.abs(forceNode.obj.centerPosition.getX() + f0.f
-					* Math.cos(f0.radian));
-			var y = Math.abs(forceNode.obj.centerPosition.getY() + f0.f
-					* Math.sin(f0.radian));
-			forceNode.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
-					x, y);
-		}
 
 	};
 
@@ -211,8 +294,6 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 			var startDegree = 30;
 			for ( var i = 0; i < childn.length; i++) {
 				cnode = childn[i];
-				this.connectorUtil.bindingConnector(root.obj, cnode.obj,
-						'#121011', '#121011', 1);
 
 				cnode.radian = (startDegree + i * degree) * 0.017453293;
 				var Xi = Math.floor(root.obj.centerPosition.getX()
@@ -222,6 +303,8 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 				cnode.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
 						Xi, Yi);
 
+				window.org.xiha.html5.core.connectorUtil.bindingConnector(
+						root.obj, cnode.obj, '#121011', '#121011', 1);
 				// console.log("child,X:"+Xi+",Y:"+Yi);
 
 				this.ergod(cnode);
