@@ -86,92 +86,91 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 	// this.matchedNodes = new Array();
 	this.connectorUtil = new org.xiha.html5.core.ConnectorUtil();
 	this.radius = radius;
-	this.kPush = 1;
+	this.kPush = 2;
 	this.kPull = 0.02;
 	this.minLen = 60;
 	// 从根开始遍历结点
 	this.genPushForce = function(beginPoint, endPoint) {
 		var a = endPoint.getY() - beginPoint.getY();
 		var b = endPoint.getX() - beginPoint.getX();
-		if (b == 0) {
-			b = 0.0001;
-		}
-		if (a == 0) {
-			a = 0.0001;
-		}
-		// 保证被除数不为0
 
-		var radian = Math.atan(a / b);
+		var c = this.abc(a, b);
 
-		if (a > 0 && b < 0) {
-			radian = radian + Math.PI;
-		} else if (a < 0 && b < 0) {
-			radian = -Math.PI + radian;
-
-		}
-
-		var f = this.kPush * (100 / (a / Math.sin(radian)));
-		return new org.xiha.html5.core.force(f, radian);
+		var f = this.kPush * (100 / (c.c));
+		return new org.xiha.html5.core.force(f, c.r);
 	};
 
 	this.genPullForce = function(beginPoint, endPoint) {
 		var a = endPoint.getY() - beginPoint.getY();
 		var b = endPoint.getX() - beginPoint.getX();
-		if (b == 0) {
-			b = 0.0001;
-		}
-		// if (a == 0) {
-		// a = 0.0001;
-		// }
-		// 保证被除数不为0
-		var radian = Math.atan(a / b);
 
-		if (a > 0 && b < 0) {
-			radian = radian + Math.PI;
-		} else if (a < 0 && b < 0) {
-			// console.log('-----');
-			radian = -Math.PI + radian;
-		}
-
-		var len = a / Math.sin(radian);
+		var r = 0;
 		var f = 0;
-		if (len < 0) {
-			console.log('len <0,' + len);
-		}
-		f = this.kPull * (Math.abs(len) - this.minLen);
 
-		// if (Math.abs(len) > this.minLen) {
-		//
-		//
-		// } else if (Math.abs(len) < this.minLen) {
-		// f = -this.kPull * (this.minLen-Math.abs(len) );
-		//
-		// } else if (Math.abs(len) == this.minLen) {
-		// f = 0;
-		// }
-		return new org.xiha.html5.core.force(f, radian);
+		var c = this.abc(a, b);
+
+		var subLen = c.c - this.minLen;
+		f = Math.abs(this.kPull * subLen);
+
+		if (subLen > 0) {
+			r = c.r;
+		} else {
+			r = c.r + Math.PI;
+		}
+
+		return new org.xiha.html5.core.force(f, r);
 	};
 
+	this.abc = function(a, b) {
+		var r = 0;
+		var c = 0;
+
+		if (a > 0 && b < 0) {
+			r = Math.atan(a / b) + Math.PI;
+			c = a / Math.sin(r);
+
+		} else if (a > 0 && b > 0) {
+			r = Math.atan(a / b);
+			c = a / Math.sin(r);
+
+		} else if (a == 0 && b < 0) {
+			r = Math.PI;
+			c = -b;
+
+		} else if (a == 0 && b > 0) {
+			r = 0;
+			c = b;
+
+		} else if (a < 0 && b < 0) {
+			r = -Math.PI + Math.atan(a / b);
+			c = a / Math.sin(r);
+
+		} else if (a < 0 && b > 0) {
+			r = Math.atan(a / b);
+			c = a / Math.sin(r);
+
+		} else if (a > 0 && b == 0) {
+			r = Math.PI / 2;
+			c = a;
+
+		} else if (a < 0 && b == 0) {
+			r = -Math.PI / 2;
+			c = -a;
+
+		} else if (a == 0 && b == 0) {
+			r = 0;
+			c = 0;
+		}
+		return {
+			'c' : c,
+			'r' : r
+		};
+	};
 	this.addForce = function(f1, f2) {
 		var a = Math.sin(f1.radian) * f1.f + Math.sin(f2.radian) * f2.f;
 		var b = Math.cos(f1.radian) * f1.f + Math.cos(f2.radian) * f2.f;
-		if (b == 0) {
-			b = 0.0001;
-		}
-		// if (a == 0) {
-		// a = 0.0001;
-		// }
-		var radian = Math.atan(a / b);
-		if (a > 0 && b < 0) {
-			radian = radian + Math.PI;
-		} else if (a < 0 && b < 0) {
-			radian = -Math.PI + radian;
-		}
-		var forceHe = 0;
-		if (Math.sin(radian) != 0) {
-			forceHe = a / Math.sin(radian);
-		}
-		return new org.xiha.html5.core.force(forceHe, radian);
+		var c = this.abc(a, b);
+		return new org.xiha.html5.core.force(c.c, c.r);
 
 	};
 
@@ -201,8 +200,8 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 						}
 					}
 				}
-				console.log(forceNode.id + '受到' + nn + '个推力，合力=');
-				console.log(f0);
+				// console.log(forceNode.id + '受到' + nn + '个推力，合力=');
+				// console.log(f0);
 				var f1 = new org.xiha.html5.core.force(0, 0);
 				if (forceNode.parent != null) {
 					f1 = this.genPullForce(forceNode.obj.centerPosition,
@@ -215,15 +214,13 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 					// var tmpf1 = this.genPullForce(
 					// tmpchild.obj.centerPosition,
 					// forceNode.parent.centerPosition);
-					//						
+					//
 					// f1 = this.addForce(tmpf1, f1);
 					// }
-					// this.genPullForce(forceNode.obj.centerPosition,
-					// forceNode.parent.centerPosition);
 					// }
 
-					console.log(forceNode.id + '受到1个推力，合力=');
-					console.log(f1);
+					// console.log(forceNode.id + '受到1个推力，合力=');
+					// console.log(f1);
 
 				}
 				fn = this.addForce(f1, f0);
