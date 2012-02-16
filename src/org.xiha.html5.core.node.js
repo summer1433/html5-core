@@ -76,9 +76,16 @@ org.xiha.html5.core.NodeAutoUtil = function() {
 org.xiha.html5.core.force = function(f, radian) {
 	this.f = f;
 	this.radian = radian;
+	this.wastage = function() {
+		if (f < this.minFZero) {
+			f = 0;
+		}
+
+	};
 };
 
 org.xiha.html5.core.NodeUtil = function(radius) {
+	this.countfb = 0;
 	this.isfb = true;
 	this.nodeIdSequence = 0;
 	this.nodesMap = {};
@@ -117,7 +124,6 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 		} else {
 			r = c.r + Math.PI;
 		}
-
 		return new org.xiha.html5.core.force(f, r);
 	};
 
@@ -170,14 +176,15 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 		var a = Math.sin(f1.radian) * f1.f + Math.sin(f2.radian) * f2.f;
 		var b = Math.cos(f1.radian) * f1.f + Math.cos(f2.radian) * f2.f;
 		var c = this.abc(a, b);
-		return new org.xiha.html5.core.force(c.c, c.r);
+		var f = c.c;
+		return new org.xiha.html5.core.force(f, c.r);
 
 	};
 
 	this.forceBalance = function() {
-		if (this.isfb)
+		if (this.isfb) {
+			this.countfb++;
 			for ( var i = 0; i < this.nodes.length; i++) {
-				var nn = 0;
 				var forceNode = this.nodes[i];
 				var fn = new org.xiha.html5.core.force(0, 0);
 				var f0 = new org.xiha.html5.core.force(0, 0);
@@ -185,7 +192,6 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 				if (forceNode.id != 1) {
 					for ( var j = 0; j < this.nodes.length; j++) {
 						if (forceNode.id != this.nodes[j].id) {
-							nn++;
 							var tmpf0 = this.genPushForce(
 									this.nodes[j].obj.centerPosition,
 									forceNode.obj.centerPosition);
@@ -208,16 +214,33 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 							forceNode.parent.centerPosition);
 					// var c1 = f1.radian / 0.017453293;
 					// console.log('拉力f1['+c1+'],大小为['+f1.f+']');
-					// if (forceNode.childs != null) {
-					// for ( var m = 0; m < forceNode.childs.length; m++) {
-					// var tmpchild = forceNode.childs[m];
-					// var tmpf1 = this.genPullForce(
-					// tmpchild.obj.centerPosition,
-					// forceNode.parent.centerPosition);
-					//
-					// f1 = this.addForce(tmpf1, f1);
-					// }
-					// }
+					var fc = new org.xiha.html5.core.force(0, 0);
+					if (forceNode.childs != null) {
+//						if (this.countfb < 30) {
+//							console
+//									.log('字节点应力添加前f=' + f1.f + ',r='
+//											+ f1.radian);
+//						}
+
+						for ( var m = 0; m < forceNode.childs.length; m++) {
+							var tmpchild = forceNode.childs[m];
+							var tmpf1 = this.genPullForce(
+									forceNode.obj.centerPosition,
+									tmpchild.obj.centerPosition);
+//							if (this.countfb < 30) {
+//
+//								console.log('tmpf1,f=' + tmpf1.f + ',r='
+//										+ tmpf1.radian);
+//							}
+							fc = this.addForce(fc, tmpf1);
+						}
+						f1 = this.addForce(fc, f1);
+//						if (this.countfb < 30) {
+//							console.log('子节点合力f=' + fc.f + ',r=' + fc.radian);
+//
+//							console.log('合力运算后f=' + f1.f + ',r=' + f1.radian);
+//						}
+					}
 
 					// console.log(forceNode.id + '受到1个推力，合力=');
 					// console.log(f1);
@@ -235,7 +258,7 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 				forceNode.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
 						x, y);
 			}
-
+		}
 	};
 
 	this.addNode = function(node) {
