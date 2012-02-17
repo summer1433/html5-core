@@ -93,9 +93,9 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 	// this.matchedNodes = new Array();
 	this.connectorUtil = new org.xiha.html5.core.ConnectorUtil();
 	this.radius = radius;
-	this.kPush = 2;
-	this.kPull = 0.02;
-	this.minLen = 60;
+	this.kPush = 0.4;
+	this.kPull = 0.15;
+	this.minLen = 50;
 	// 从根开始遍历结点
 	this.genPushForce = function(beginPoint, endPoint) {
 		var a = endPoint.getY() - beginPoint.getY();

@@ -7,6 +7,8 @@ org.xiha.html5.core.Arccube = function(centerPosition, w, h) {
 	this.renderableText = null;
 
 	this.render = function() {
+		if (this.renderbefore != null)
+			this.renderbefore();
 
 		var ctx = this.getContext();
 		ctx.beginPath();
@@ -44,7 +46,8 @@ org.xiha.html5.core.Arccube = function(centerPosition, w, h) {
 			ctx.textBaseline = "middle";
 			ctx.fillText(this.renderableText.text(), x, y);
 		}
-
+		if (this.renderafter != null)
+			this.renderafter();
 	};
 
 	this.ccRect = function(position, w, h, r) {

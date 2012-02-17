@@ -1,11 +1,19 @@
 request('org.xiha.html5.core');
 
-org.xiha.html5.core.Actioncube = function(centerPosition, w, h) {
+org.xiha.html5.core.Actioncube = function(centerPosition, w, h, offsetLeft,
+		offsetTop) {
 	org.xiha.html5.core.Arccube.call(this, centerPosition, w, h);
 	this.addClickAbility();
+	this.offsetLeft = offsetLeft;
+	this.offsetTop = offsetTop;
 	this.snapTo = null;
 	this.doClick = function() {
 
+	};
+	this.renderbefore = function() {
+		this.centerPosition = new org.xiha.html5.core.NormalPoint(
+				this.snapTo.centerPosition.getX() + this.offsetLeft,
+				this.snapTo.centerPosition.getY() + this.offsetTop);
 	};
 
 };
@@ -18,8 +26,9 @@ org.xiha.html5.core.Actioncube.prototype.listenEvent = function() {
 	if (e.msg == (new org.xiha.html5.core.Constants()).CLICK_EVENT) {
 		this.snapTo = e.object;
 		var cp = new org.xiha.html5.core.NormalPoint(this.snapTo.centerPosition
-				.getX() + 15, this.snapTo.centerPosition.getY() - 22);
-
+				.getX()
+				+ this.offsetLeft, this.snapTo.centerPosition.getY()
+				+ this.offsetTop);
 		this.centerPosition = cp;
 	}
 	// console.log(e);
