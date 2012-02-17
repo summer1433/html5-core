@@ -47,7 +47,8 @@
 			canvas.height = window.innerHeight;
 		}
 		var scene = new org.xiha.html5.core.Scene(canvas, 1);
-		new org.xiha.html5.core.NodeUtil(40);
+		var defaultRadiu = 40;
+		new org.xiha.html5.core.NodeUtil(defaultRadiu);
 
 		var maxnum = 5;
 
@@ -62,7 +63,7 @@
 		};
 
 		var addActionButton = new org.xiha.html5.core.Actioncube(null, rect.w,
-				rect.h,15,-22);
+				rect.h, 15, -24);
 		addActionButton.r = rect.r;
 		addActionButton.setFillStyle(rect.fillStyle);
 		addActionButton.clickEnable = rect.clickEnable;
@@ -77,9 +78,10 @@
 				var ctx = addActionButton.getContext();
 				var x = self.centerPosition.getX();
 				var y = self.centerPosition.getY();
+				
 				ctx.strokeStyle = "#FFFFFF";
 				ctx.lineWidth = 2;
-
+				ctx.beginPath();
 				ctx.moveTo(x, y - (self.h / 2) + 3);
 				ctx.lineTo(x, y + (self.h / 2) - 3);
 
@@ -89,19 +91,55 @@
 				ctx.lineTo(x + (self.w / 2) - 3, y);
 				ctx.stroke();
 			}
-			//console.log("do something");
 		}
 		addActionButton.doClick = function() {
 			var e = this.scene.eventPool.getRecentEvent();
-			var o = e.object;
-			var cube_i = createCube();
+			var parentcube = e.object;
+			var randomNewCube = createCube();
 
-			var node_i = new org.xiha.html5.core.Node(cube_i, o, null);
+			var x = Math.abs(parentcube.centerPosition.getX() + defaultRadiu
+					* Math.cos(30 * 0.017453293));
+			var y = Math.abs(parentcube.centerPosition.getY() + defaultRadiu
+					* Math.sin(30 * 0.017453293));
+			randomNewCube.centerPosition = new org.xiha.html5.core.NormalPoint(
+					x, y);
+			new org.xiha.html5.core.Node(randomNewCube, parentcube, null);
 
-			window.org.xiha.html5.core.nodeUtil
-					.ergod(window.org.xiha.html5.core.scene.rootNode);
-			window.org.xiha.html5.core.scene.clearScene();
 		}
+
+		var focusButton = new org.xiha.html5.core.Actioncube(null, rect.w,
+				rect.h, -4, -24);
+		focusButton.r = rect.r;
+		focusButton.setFillStyle(rect.fillStyle);
+		focusButton.clickEnable = rect.clickEnable;
+
+		//实现super
+		focusButton.tmp = focusButton.render;
+		focusButton.render = function() {
+			var self = focusButton;
+			if (self.centerPosition != null) {
+				focusButton.tmp();
+				var ctx = focusButton.getContext();
+				var x = self.centerPosition.getX();
+				var y = self.centerPosition.getY();
+
+				ctx.beginPath();
+				ctx.arc(x, y, 4, 0, 2 * Math.PI, false);
+				ctx.fillStyle = "#FFFFFF";
+				ctx.closePath();
+				ctx.fill();
+			}
+		}
+		focusButton.doClick = function() {
+			var e = this.scene.eventPool.getRecentEvent();
+			var o = e.object;
+			if (o.renderableText != null) {
+				window.location = '/index.htm?ac=view&text='
+						+ o.renderableText.text();
+			}
+			console.log('ffff');
+		}
+
 		//circle.enableMoving();
 
 		var cube1 = createCube();

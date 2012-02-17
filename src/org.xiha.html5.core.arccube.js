@@ -12,7 +12,6 @@ org.xiha.html5.core.Arccube = function(centerPosition, w, h) {
 
 		var ctx = this.getContext();
 		ctx.beginPath();
-		ctx.fillStyle = this.fillStyle;
 		// var rec = this.ccRect(this.centerPosition, this.w, this.h, this.r);
 
 		// ctx.arc(rec.c1.x, rec.c1.y, this.r, Math.PI, 1.5 * Math.PI, false);
@@ -38,6 +37,8 @@ org.xiha.html5.core.Arccube = function(centerPosition, w, h) {
 				this.r);
 
 		ctx.closePath();
+		ctx.fillStyle = this.fillStyle;
+
 		ctx.fill();
 		if (this.renderableText != null) {
 			ctx.fillStyle = this.renderableText.fillStyle();
