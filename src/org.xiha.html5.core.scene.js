@@ -5,7 +5,6 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.objectMap = {};
 	this.renderAble = new Array();
 
-	this.eventPool = new org.xiha.html5.core.EventPool(100, self);
 	this.canvas = canvas;
 
 	this.sos = new Array();// selected objects

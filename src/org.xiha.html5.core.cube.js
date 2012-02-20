@@ -246,7 +246,7 @@ org.xiha.html5.core.Cube.prototype.mouseclickAction = function(ev) {
 	var mouse = org.xiha.html5.util.getMouse(evt, this.getCanvas());
 	if (self.isOver(mouse)) {
 		self.scene.select(self);
-		self.scene.eventPool.addNewEvent(new org.xiha.html5.core.Event(
+		window.org.xiha.html5.core.eventPool.addNewEvent(new org.xiha.html5.core.Event(
 				(new org.xiha.html5.core.Constants()).CLICK_EVENT, self));
 
 	}
@@ -268,7 +268,7 @@ org.xiha.html5.core.Cube.prototype.mousemoveAction = function(ev) {
 			- (this.mouseOverPosition.getY() - mouse[1]);
 
 	self.uniformMoveTo(nx, ny, mouse[0], mouse[1]);
-	self.scene.eventPool.addNewEvent(new org.xiha.html5.core.Event(
+	window.org.xiha.html5.core.eventPool.addNewEvent(new org.xiha.html5.core.Event(
 			(new org.xiha.html5.core.Constants()).CLICK_EVENT, self));
 	// /self.scene.checkOverlap();
 	self.scene.allRender = true;

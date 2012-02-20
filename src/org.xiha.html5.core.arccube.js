@@ -95,7 +95,7 @@ org.xiha.html5.core.Arccube.prototype.mouseDoubleClickAction = function(ev) {
 	var mouse = org.xiha.html5.util.getMouse(evt, this.getCanvas());
 	if (self.isOver(mouse)) {
 		self.scene.select(self);
-		self.scene.eventPool
+		window.org.xiha.html5.core.eventPool
 				.addNewEvent(new org.xiha.html5.core.Event(
 						(new org.xiha.html5.core.Constants()).DOUBLE_CLICK_EVENT,
 						self));

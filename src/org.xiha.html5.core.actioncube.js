@@ -7,6 +7,7 @@ org.xiha.html5.core.Actioncube = function(centerPosition, w, h, offsetLeft,
 	this.offsetLeft = offsetLeft;
 	this.offsetTop = offsetTop;
 	this.snapTo = null;
+	this.currentEvent = null;
 	this.doClick = function() {
 
 	};
@@ -21,10 +22,10 @@ org.xiha.html5.core.Actioncube = function(centerPosition, w, h, offsetLeft,
 org.xiha.html5.util.extend(org.xiha.html5.core.Actioncube,
 		org.xiha.html5.core.Arccube);
 
-org.xiha.html5.core.Actioncube.prototype.listenEvent = function() {
-	var e = this.scene.eventPool.getRecentEvent();
-	if (e.msg == (new org.xiha.html5.core.Constants()).CLICK_EVENT) {
-		this.snapTo = e.object;
+org.xiha.html5.core.Actioncube.prototype.listenEvent = function(ev) {
+	this.currentEvent = ev;
+	if (ev.msg == (new org.xiha.html5.core.Constants()).CLICK_EVENT) {
+		this.snapTo = ev.object;
 		var cp = new org.xiha.html5.core.NormalPoint(this.snapTo.centerPosition
 				.getX()
 				+ this.offsetLeft, this.snapTo.centerPosition.getY()

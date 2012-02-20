@@ -44,8 +44,9 @@ org.xiha.html5.core.Event = function(msg, object) {
 	this.object = object;
 };
 
-org.xiha.html5.core.EventPool = function(maxsize, scene) {
-	this.scene = scene;
+org.xiha.html5.core.EventPool = function(maxsize) {
+	var self = this;
+	this.scene = window.org.xiha.html5.core.scene;
 	this._DEFAULT_MAX_SIZE = 100;
 	this.maxsize = 0;
 	this.events = new Array();
@@ -54,7 +55,7 @@ org.xiha.html5.core.EventPool = function(maxsize, scene) {
 	} else {
 		this.maxsize = maxsize;
 	}
-	// console.log('event pool init,maxsize:' + this.maxsize);
+
 	this.getRecentEvent = function() {
 		var len = this.events.length;
 		if (len != 0)
@@ -64,20 +65,29 @@ org.xiha.html5.core.EventPool = function(maxsize, scene) {
 	this.addNewEvent = function(event) {
 		this.events.push(event);
 
-		while (this.events.length >= this.maxsize) {
-			this.events.shift();
-			// console.log("event pool full,shift some old event");
-		}
-
-		var listeners = this.scene.renderAble;
-		for ( var i = 0; i < listeners.length; i++) {
-			if (listeners[i].listenEvent != null) {
-				listeners[i].listenEvent();
-				// console.log(listeners[i]);
-			}
-		}
+//		while (this.events.length >= this.maxsize) {
+//			this.events.shift();
+//			console.log("事件满了，丢弃掉没有来得及处理的老事件");
+//		}
 
 		return true;
 	};
+
+	setInterval(function() {
+		var listeners = self.scene.renderAble;
+		if (self.events != null && self.events.length > 0) {
+			console.log('fffff');
+			var ev = self.events.shift();
+			
+			for ( var i = 0; i < listeners.length; i++) {
+				if (listeners[i].listenEvent != null) {
+					listeners[i].listenEvent(ev);
+					// console.log(listeners[i]);
+				}
+			}
+		}
+	}, 1);
+
+	window.org.xiha.html5.core.eventPool = self;
 
 };
