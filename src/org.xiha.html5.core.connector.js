@@ -2,6 +2,28 @@ request('org.xiha.html5.core');
 request('org.xiha.html5.core.scene');
 
 org.xiha.html5.core.ConnectorUtil = function() {
+
+	this.destoryConnector = function(cubeId) {
+		var destoryIds = new Array();
+		var renderAble = org.xiha.html5.core.scene.renderAble;
+		for ( var i = 0; i < renderAble.length; i++) {
+			var cnn = renderAble[i];
+
+			if (cnn instanceof org.xiha.html5.core.Connector) {
+				if (cnn.cube1.id == cubeId || cnn.cube2.id == cubeId) {
+					destoryIds.push(cnn.id);
+
+				}
+			}
+		}
+		if (destoryIds != null && destoryIds.length != 0) {
+			while (destoryIds.length != 0) {
+				org.xiha.html5.core.scene.removeRenderable(destoryIds.pop());
+			}
+		}
+
+	};
+
 	this.bindingConnector = function(cube1, cube2, strokeStyle, fillStyle,
 			lineWidth) {
 		var renderAble = org.xiha.html5.core.scene.renderAble;
@@ -13,8 +35,8 @@ org.xiha.html5.core.ConnectorUtil = function() {
 				if ((cnn.cube1.id == cube1.id && cnn.cube2.id == cube2.id)
 						|| (cnn.cube1.id == cube2.id && cnn.cube2.id == cube1.id)) {
 					isExist = true;
-					//console.log("connector already exist, connector is:");
-					//console.log(cnn);
+					// console.log("connector already exist, connector is:");
+					// console.log(cnn);
 					break;
 				}
 			}
@@ -58,11 +80,11 @@ org.xiha.html5.core.Connector.prototype = {
 		ctx.beginPath();
 		var c1 = this.cube1.centerPosition;
 		var c2 = this.cube2.centerPosition;
-		if(c1==null) {
-			console.log("error cubeid ["+this.cube1.id+"] cp is null");
+		if (c1 == null) {
+			console.log("error cubeid [" + this.cube1.id + "] cp is null");
 		}
-		if(c2==null) {
-			console.log("error cubeid ["+this.cube2.id+"] cp is null");
+		if (c2 == null) {
+			console.log("error cubeid [" + this.cube2.id + "] cp is null");
 		}
 		var xy1 = this.cal(c1, c2, this.cube1.w, this.cube1.h);
 		var xy2 = this.cal(c2, c1, this.cube2.w, this.cube2.h);

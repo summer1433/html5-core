@@ -22,6 +22,7 @@ org.xiha.html5.core.NormalPoint.prototype.transTo = function() {
 };
 
 org.xiha.html5.core.RenderableText = function(text, fillStyle, font) {
+	this.t = text;
 	this.text = function() {
 		return text;
 	};
@@ -76,7 +77,6 @@ org.xiha.html5.core.EventPool = function(maxsize) {
 	setInterval(function() {
 		var listeners = self.scene.renderAble;
 		if (self.events != null && self.events.length > 0) {
-			console.log('fffff');
 			var ev = self.events.shift();
 			
 			for ( var i = 0; i < listeners.length; i++) {

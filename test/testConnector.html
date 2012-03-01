@@ -80,7 +80,7 @@
 				var ctx = addActionButton.getContext();
 				var x = self.centerPosition.getX();
 				var y = self.centerPosition.getY();
-				
+
 				ctx.strokeStyle = "#FFFFFF";
 				ctx.lineWidth = 2;
 				ctx.beginPath();
@@ -107,8 +107,31 @@
 					x, y);
 			new org.xiha.html5.core.Node(randomNewCube, parentcube, null);
 
+			window.org.xiha.html5.core.eventPool
+					.addNewEvent(new org.xiha.html5.core.Event(
+							(new org.xiha.html5.core.Constants()).DOUBLE_CLICK_EVENT,
+							randomNewCube));
 		}
+		org.xiha.html5.core.input.Editor.prototype.change = function() {
+			if (this.renderText != null) {
+				var sameNode = window.org.xiha.html5.core.nodeUtil
+						.searchNodeByText(this.renderText.text());
 
+				if (sameNode != null) {
+					var toNode = sameNode;
+					var pNode = null;
+					var frmNode = window.org.xiha.html5.core.nodeUtil
+							.searchNodeByCubeId(this.object.id);
+
+					console.log(frmNode);
+					pNode = window.org.xiha.html5.core.nodeUtil
+							.searchNodeByCubeId(frmNode.parent.id);
+					window.org.xiha.html5.core.nodeUtil.combineNode(frmNode,
+							toNode, pNode);
+				}
+			}
+			return true;
+		}
 		var focusButton = new org.xiha.html5.core.Actioncube(null, rect.w,
 				rect.h, -4, -24);
 		focusButton.r = rect.r;
@@ -133,7 +156,7 @@
 			}
 		}
 		focusButton.doClick = function() {
-			var e = this.scene.eventPool.getRecentEvent();
+			var e = this.currentEvent;
 			var o = e.object;
 			if (o.renderableText != null) {
 				window.location = '/index.htm?ac=view&text='
@@ -145,7 +168,7 @@
 		//circle.enableMoving();
 
 		var cube1 = createCube();
-		var cube2 = createCube();
+		/* var cube2 = createCube();
 		var cube3 = createCube();
 		var cube4 = createCube();
 
@@ -155,7 +178,7 @@
 
 		var cube7 = createCube();
 		var cube8 = createCube();
-		var cube9 = createCube();
+		var cube9 = createCube(); */
 		//var cube10 = createCube();
 		//var cube11 = createCube();
 		//var cube12 = createCube();
@@ -164,13 +187,13 @@
 		var node = new org.xiha.html5.core.Node(cube1, null, null);
 		scene.setRootNode(node);
 
-		new org.xiha.html5.core.Node(cube2, cube1);
+		//new org.xiha.html5.core.Node(cube2, cube1);
 		/* new org.xiha.html5.core.Node(cube10, cube2, null);
 		new org.xiha.html5.core.Node(cube11, cube2, null);
 		new org.xiha.html5.core.Node(cube12, cube2, null);
 		new org.xiha.html5.core.Node(cube13, cube2, null); */
 
-		new org.xiha.html5.core.Node(cube3, cube1);
+		/* new org.xiha.html5.core.Node(cube3, cube1);
 		new org.xiha.html5.core.Node(cube4, cube1);
 		new org.xiha.html5.core.Node(cube5, cube1);
 
@@ -178,10 +201,10 @@
 		new org.xiha.html5.core.Node(cube7, cube6, null);
 		new org.xiha.html5.core.Node(cube8, cube6, null);
 		new org.xiha.html5.core.Node(cube9, cube6, null);
-       
-		new org.xiha.html5.core.Node(cube7, cube3, null);
+		
+		new org.xiha.html5.core.Node(cube7, cube3, null); */
 
-		new org.xiha.html5.core.input.Editor("eee1");
+		new org.xiha.html5.core.input.Editor("myeditor");
 
 		scene.ready();
 		scene.forceBalance(30);
@@ -199,9 +222,37 @@
 			cube.editorAble();
 			return cube;
 		}
+		createOperationPanel();
+		function createOperationPanel() {
+			var w = 50;
+			var h = w * 0.618;
+
+			var opNp1 = new org.xiha.html5.core.NormalPoint(100, 100);
+
+			var op1 = new org.xiha.html5.core.Arccube(opNp1, w, h);
+			op1.r = 5;
+			op1.typeId = 1;
+			op1.setFillStyle('#dbf514');
+			op1.clickEnable = true;
+			op1.addClickAbility();
+
+			op1.renderableText = new org.xiha.html5.core.RenderableText('新增',
+					"black", "12px/29px sans-serif");
+			op1.doMouseDown = function() {
+				op1.setFillStyle('#ffffff');
+			}
+			op1.doMouseUp = function() {
+				op1.setFillStyle('#dbf514');
+
+			}
+
+			new org.xiha.html5.core.input.Editor("myeditor");
+
+		}
 	</script>
-	<div style="position: absolute" id="eee1" contenteditable="true" />
+
 	<!-- 
+	<div style="position: absolute" id="eee1" contenteditable="true" />
 		<input id="eee1_input" type="text" value="" />
 	</div>
 	 -->

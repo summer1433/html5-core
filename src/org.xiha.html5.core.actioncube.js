@@ -26,11 +26,15 @@ org.xiha.html5.core.Actioncube.prototype.listenEvent = function(ev) {
 	this.currentEvent = ev;
 	if (ev.msg == (new org.xiha.html5.core.Constants()).CLICK_EVENT) {
 		this.snapTo = ev.object;
-		var cp = new org.xiha.html5.core.NormalPoint(this.snapTo.centerPosition
-				.getX()
-				+ this.offsetLeft, this.snapTo.centerPosition.getY()
-				+ this.offsetTop);
-		this.centerPosition = cp;
+		if (this.snapTo.typeId == 0) {
+
+			var cp = new org.xiha.html5.core.NormalPoint(
+					this.snapTo.centerPosition.getX() + this.offsetLeft,
+					this.snapTo.centerPosition.getY() + this.offsetTop);
+			this.centerPosition = cp;
+		}else{
+			this.centerPosition = null;
+		}
 	}
 	// console.log(e);
 };

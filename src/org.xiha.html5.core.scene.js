@@ -26,7 +26,17 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.getContext = function() {
 		return this.canvas.getContext("2d");
 	};
+	
+	this.removeRenderable = function(id) {
+		delete this.objectMap[id];
+		for ( var i = 0; i < this.renderAble.length; i++) {
+			if (id == this.renderAble[i].id) {
+				this.renderAble.splice(i, 1);
+				break;
+			}
+		}
 
+	};
 	this.addRenderable = function(o) {
 		this.objectIdSequence++;
 
@@ -81,7 +91,7 @@ org.xiha.html5.core.Scene.prototype = {
 
 				self.allRender = false;
 			}
-			
+
 			//
 
 		}, 1);
