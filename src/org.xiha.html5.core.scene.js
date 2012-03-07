@@ -4,6 +4,7 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.objectIdSequence = 0;
 	this.objectMap = {};
 	this.renderAble = new Array();
+	this.listeners = new Array();
 
 	this.canvas = canvas;
 
@@ -11,7 +12,7 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.isMultiSelect = false;
 	this.allRender = true;
 	this.rootNode = null;
-
+	this.mouse = null;
 	this.setRootNode = function(node) {
 		this.rootNode = node;
 	};
@@ -26,7 +27,14 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.getContext = function() {
 		return this.canvas.getContext("2d");
 	};
-	
+	this.addListener = function(obj) {
+		if (obj.listenEvent != null) {
+
+			this.listeners.push(obj);
+		} else {
+			console.log("obj not implements listenEvent function!!");
+		}
+	};
 	this.removeRenderable = function(id) {
 		delete this.objectMap[id];
 		for ( var i = 0; i < this.renderAble.length; i++) {
@@ -58,6 +66,67 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 
 	};
 
+	// 注册事件
+	var mda = function(ev) {
+		var evt = window.event || arguments[0];
+
+		self.mouse = org.xiha.html5.util.getMouse(evt, self.canvas);
+
+		window.org.xiha.html5.core.eventPool
+				.addNewEvent(new org.xiha.html5.core.Event(
+						window.org.xiha.html5.core.constants.MOUSE_DOWN_EVENT,
+						self));
+	};
+
+	this.canvas.addEventListener('mousedown', mda, false);
+
+	var mca = function(ev) {
+		var evt = window.event || arguments[0];
+
+		self.mouse = org.xiha.html5.util.getMouse(evt, self.canvas);
+
+		window.org.xiha.html5.core.eventPool
+				.addNewEvent(new org.xiha.html5.core.Event(
+						window.org.xiha.html5.core.constants.MOUSE_CLICK_EVENT,
+						self));
+	};
+
+	this.canvas.addEventListener('click', mca, false);
+
+	var mma = function(ev) {
+		var evt = window.event || arguments[0];
+
+		self.mouse = org.xiha.html5.util.getMouse(evt, self.canvas);
+		window.org.xiha.html5.core.eventPool
+				.addNewEvent(new org.xiha.html5.core.Event(
+						window.org.xiha.html5.core.constants.MOUSE_MOVE_EVENT,
+						self));
+	};
+
+	this.canvas.addEventListener('mousemove', mma, false);
+
+	var mua = function(ev) {
+		var evt = window.event || arguments[0];
+
+		self.mouse = org.xiha.html5.util.getMouse(evt, self.canvas);
+		window.org.xiha.html5.core.eventPool
+				.addNewEvent(new org.xiha.html5.core.Event(
+						window.org.xiha.html5.core.constants.MOUSE_UP_EVENT,
+						self));
+	};
+	this.canvas.addEventListener('mouseup', mua, false);
+
+	var mdca = function(ev) {
+		var evt = window.event || arguments[0];
+
+		self.mouse = org.xiha.html5.util.getMouse(evt, self.canvas);
+		window.org.xiha.html5.core.eventPool
+				.addNewEvent(new org.xiha.html5.core.Event(
+						window.org.xiha.html5.core.constants.MOUSE_DBCLICK_EVENT,
+						self));
+	};
+	this.canvas.addEventListener('dblclick', mdca, false);
+
 	// 定义全局可见
 	window.org.xiha.html5.core.scene = self;
 };
@@ -66,7 +135,7 @@ org.xiha.html5.core.Scene.prototype = {
 	ready : function() {
 		var self = this;
 		if (self.rootNode != null) {
-			window.org.xiha.html5.core.nodeUtil.ergod(this.rootNode);
+			// window.org.xiha.html5.core.nodeUtil.ergod(this.rootNode);
 		}
 		self.allReady();
 	},

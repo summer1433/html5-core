@@ -1,76 +1,54 @@
 request('org.xiha.html5.util');
 
-org.xiha.html5.core.Node = function(obj, parentObj) {
+org.xiha.html5.core.Node = function(obj) {
 	this.obj = obj;
-	this.parent = parentObj;
+	this.parents = null;
 	this.childs = null;
 	this.radian = null;
 	this.id = null;
+
+	this.addParent = function(parent) {
+		if (this.parents == null) {
+			this.parents = new Array();
+		}
+		var isExist = false;
+		for ( var i = 0; i < this.parents.length; i++) {
+			if (this.parents[i].id == parent.id) {
+				isExist = true;
+				break;
+			}
+		}
+		if (!isExist) {
+			this.parents.push(parent);
+			window.org.xiha.html5.core.connectorUtil.bindingConnector(obj,
+					parent, '#121011', '#121011', 1);
+		}
+	};
 
 	this.addChild = function(child) {
 		if (this.childs == null) {
 			this.childs = new Array();
 		}
-		this.childs.push(child);
-	};
+		var isExist = false;
+		for ( var i = 0; i < this.childs.length; i++) {
+			if (this.childs[i].id == child.id) {
+				isExist = true;
+				break;
+			}
+		}
+		if (!isExist) {
+			this.childs.push(child);
+			window.org.xiha.html5.core.connectorUtil.bindingConnector(obj,
+					child, '#121011', '#121011', 1);
+		}
 
-	this.setParent = function(parent) {
-		this.parent = parent;
 	};
 
 	if (window.org.xiha.html5.core.scene.rootNode == null) {
 		window.org.xiha.html5.core.scene.setRootNode(this);
 	}
-	if (parentObj != null) {
-		window.org.xiha.html5.core.connectorUtil.bindingConnector(obj,
-				parentObj, '#121011', '#121011', 1);
-	}
-	var nodeAutoUtil = new org.xiha.html5.core.NodeAutoUtil();
-	nodeAutoUtil.autoAddToRoot(window.org.xiha.html5.core.scene.rootNode, this);
+
 	window.org.xiha.html5.core.nodeUtil.addNode(this);
-};
-
-org.xiha.html5.core.NodeAutoUtil = function() {
-	this.autoSearchedParent = new Array();
-
-	this.autoAddToRoot = function(node, thisNode) {
-		this.search(node, thisNode);
-
-		for ( var i = 0; i < this.autoSearchedParent.length; i++) {
-			this.autoSearchedParent[i].addChild(thisNode);
-		}
-
-	};
-	this.search = function(node, thisNode) {
-
-		if (node.childs != null) {
-			if (node.obj.id != null && thisNode.parent != null
-					&& thisNode.parent.id != null
-					&& node.obj.id == thisNode.parent.id) {
-
-				this.autoSearchedParent.push(node);
-			}
-			// 继续遍历child[0..n]
-			var childn = node.childs;
-			for ( var i = 0; i < childn.length; i++) {
-				cnode = childn[i];
-
-				this.search(cnode, thisNode);
-
-			}
-
-		} else {
-			if (node.obj.id != null && thisNode.parent != null
-					&& thisNode.parent.id != null
-					&& node.obj.id == thisNode.parent.id) {
-				this.autoSearchedParent.push(node);
-
-			}
-
-			// console.log("reach child edge");
-		}
-
-	};
 };
 
 org.xiha.html5.core.force = function(f, radian) {
@@ -90,6 +68,7 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 	this.nodeIdSequence = 0;
 	this.nodesMap = {};
 	this.nodes = new Array();
+	this.cubeIDNodeID = {};
 	// this.matchedNodes = new Array();
 	this.connectorUtil = new org.xiha.html5.core.ConnectorUtil();
 	this.radius = radius;
@@ -189,6 +168,7 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 				var fn = new org.xiha.html5.core.force(0, 0);
 				var f0 = new org.xiha.html5.core.force(0, 0);
 				// console.log('开始计算nodeid:' + forceNode.id + '的受力');
+				// 1.计算Node间合力
 				if (forceNode.id != 0) {
 					for ( var j = 0; j < this.nodes.length; j++) {
 						if (forceNode.id != this.nodes[j].id) {
@@ -208,13 +188,23 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 				}
 				// console.log(forceNode.id + '受到' + nn + '个推力，合力=');
 				// console.log(f0);
-				var f1 = new org.xiha.html5.core.force(0, 0);
-				if (forceNode.parent != null) {
-					f1 = this.genPullForce(forceNode.obj.centerPosition,
-							forceNode.parent.centerPosition);
+				var fpc = new org.xiha.html5.core.force(0, 0);
+
+				// 2.计算父节点拉力或引力合力
+				var fp = new org.xiha.html5.core.force(0, 0);
+				if (forceNode.parents != null) {
+					for ( var m = 0; m < forceNode.parents.length; m++) {
+						var tmpfp = this.genPullForce(
+								forceNode.obj.centerPosition,
+								forceNode.parents[m].centerPosition);
+						fp = this.addForce(fp, tmpfp);
+
+					}
+
 				}
 				// var c1 = f1.radian / 0.017453293;
 				// console.log('拉力f1['+c1+'],大小为['+f1.f+']');
+				// 3.计算子节点拉力或引力合力
 				var fc = new org.xiha.html5.core.force(0, 0);
 				if (forceNode.childs != null) {
 					// if (this.countfb < 30) {
@@ -224,29 +214,27 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 					// }
 
 					for ( var m = 0; m < forceNode.childs.length; m++) {
-						var tmpchild = forceNode.childs[m];
-						var tmpf1 = this.genPullForce(
+						var tmpfc = this.genPullForce(
 								forceNode.obj.centerPosition,
-								tmpchild.obj.centerPosition);
+								forceNode.childs[m].centerPosition);
 						// if (this.countfb < 30) {
 						//
 						// console.log('tmpf1,f=' + tmpf1.f + ',r='
 						// + tmpf1.radian);
 						// }
-						fc = this.addForce(fc, tmpf1);
+						fc = this.addForce(fc, tmpfc);
 					}
-					f1 = this.addForce(fc, f1);
 					// if (this.countfb < 30) {
 					// console.log('子节点合力f=' + fc.f + ',r=' + fc.radian);
 					//
 					// console.log('合力运算后f=' + f1.f + ',r=' + f1.radian);
 					// }
 				}
-
+				fpc = this.addForce(fc, fp);
 				// console.log(forceNode.id + '受到1个推力，合力=');
 				// console.log(f1);
 
-				fn = this.addForce(f1, f0);
+				fn = this.addForce(fpc, f0);
 
 				// console.log(f2);
 				// var c0 = f2.radian / 0.017453293;
@@ -268,6 +256,7 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 			node.id = this.nodeIdSequence;
 			this.nodesMap[this.nodeIdSequence] = node;
 			this.nodes.push(node);
+			this.cubeIDNodeID[node.obj.id] = node.id;
 		} else if (node.id >= 0) {
 			if (this.nodesMap[node.id] == null) {
 				this.nodesMap[node.id] = node;
@@ -280,122 +269,71 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 
 	};
 
-	this.ergod = function(root) {
-
-		if (root.obj instanceof org.xiha.html5.core.Cube) {
-			if (root.parent == null && root.obj.centerPosition == null) {
-				var x = Math.floor(root.obj.scene.getWidth() / 2);
-				var y = Math.floor(root.obj.scene.getHeight() / 2);
-				root.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
-						x, y);
-				// console.log("root,X:"+x+",Y:"+y);
-			} else {
-				// console.log(root.radian);
-				if (root.radian != null && root.childs != null) {
-					// 延长子结点连接线
-					var Xi = Math.floor(root.obj.centerPosition.getX()
-							- (this.radius * 0.618) * Math.cos(cnode.radian));
-					var Yi = Math.floor(root.obj.centerPosition.getY()
-							+ (this.radius * 0.618) * Math.sin(cnode.radian));
-					root.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
-							Xi, Yi);
-				}
-
-			}
-
-		}
-
-		if (root.childs != null) {
-
-			// console.log(root.node + "has child");
-			var childn = root.childs;
-
-			var degree = 360 / childn.length;
-			var startDegree = 30;
-			for ( var i = 0; i < childn.length; i++) {
-				cnode = childn[i];
-
-				cnode.radian = (startDegree + i * degree) * 0.017453293;
-				var Xi = Math.floor(root.obj.centerPosition.getX()
-						- this.radius * Math.cos(cnode.radian));
-				var Yi = Math.floor(root.obj.centerPosition.getY()
-						+ this.radius * Math.sin(cnode.radian));
-				cnode.obj.centerPosition = new org.xiha.html5.core.NormalPoint(
-						Xi, Yi);
-
-				window.org.xiha.html5.core.connectorUtil.bindingConnector(
-						root.obj, cnode.obj, '#121011', '#121011', 1);
-				// console.log("child,X:"+Xi+",Y:"+Yi);
-
-				this.ergod(cnode);
-
-			}
-
-		} else {
-			// console.log("reach child edge");
-		}
-
-	};
-
 	this.searchNodeByCubeId = function(cubeId) {
-		for ( var i = 0; i < this.nodes.length; i++) {
-			if (this.nodes[i].obj.id != null && this.nodes[i].obj.id == cubeId) {
-				return this.nodes[i];
-			}
-		}
-		return null;
+		var node = null;
+		var nodeId = this.cubeIDNodeID[cubeId];
+
+		node = this.nodesMap[nodeId];
+
+		return node;
 	};
 
-	this.combineNode = function(frmNode, toNode, pNode) {
-		var pObj = toNode.obj;
+	this.combineNode = function(frmNode, toNode, pNodes) {
 		// 1.将frmNode的孩子过继给toNode
 		if (frmNode.childs != null && frmNode.childs.length != 0) {
 			for ( var i = 0; i < frmNode.childs.length; i++) {
+				var childObj = frmNode.childs[i];
 				if (toNode.childs == null) {
 					toNode.childs = new Array();
 				}
-				frmNode.childs[i].parent = pObj;
+
+				var childNode = this.searchNodeByCubeId(childObj.id);
+				childNode.addParent(toNode.obj);
+				toNode.addChild(childObj);
+
 				window.org.xiha.html5.core.connectorUtil.bindingConnector(
-						frmNode.childs[i].parent, frmNode.childs[i].obj,
-						'#121011', '#121011', 1);
-				toNode.childs.push(frmNode.childs[i]);
+						toNode.obj, childObj, '#121011', '#121011', 1);
 			}
 		}
 		// 2.找到frmNode的父亲，将其从父亲的孩子节点中删除，并toNode设置为其父亲的孩子
-		var reMoveIdx = -1;
-		for ( var i = 0; i < pNode.childs.length; i++) {
-			if (pNode.childs[i].id == frmNode.id) {
-				reMoveIdx = i;
-				break;
+		for ( var j = 0; j < pNodes.length; j++) {
+			var pNode = pNodes[j];
+			var reMoveIdx = -1;
+			for ( var i = 0; i < pNode.childs.length; i++) {
+				if (pNode.childs[i].id == frmNode.obj.id) {
+					reMoveIdx = i;
+					break;
+				}
 			}
+			if (reMoveIdx >= 0) {
+				pNode.childs.splice(reMoveIdx, 1, toNode.obj);
+			}
+			// 3.消除连接，并建立新连接
+			window.org.xiha.html5.core.connectorUtil
+					.destoryConnector(frmNode.obj.id);
+			this.newNode(toNode.obj, pNode.obj);
 		}
-		if (reMoveIdx >= 0) {
-			pNode.childs.splice(reMoveIdx, 1, toNode);
-		}
-		// 3.消除连接，并建立新连接
-		window.org.xiha.html5.core.connectorUtil
-				.destoryConnector(frmNode.obj.id);
-		new org.xiha.html5.core.Node(toNode.obj, pNode.obj, null);
 		// new node
 		// 4.清除frmNode中包含的cube对象，并最终清除frmNode对象
+		delete this.cubeIDNodeID[frmNode.obj.id];
 		window.org.xiha.html5.core.scene.removeRenderable(frmNode.obj.id);
 		delete frmNode.obj;
 		this.removeNode(frmNode);
 	};
 
 	// 从树上的子节点删除所有节点，释放内存
-	this.removeAllFromParentTree = function(cNode) {
-		if (cNode.childs != null && cNode.childs.length != 0) {
-			while (cNode.childs != null || cNode.childs.length != 0) {
-				var tmpNode = cNdoe.childs.pop();
-				this.removeAllFromParentTree(tmpNode);
-				this.removeNode(tmpNode);
-			}
-
-		} else {
-			this.removeNode(cNode);
-		}
-	};
+	// this.removeAllFromParentTree = function(cNode) {
+	// if (cNode.childs != null && cNode.childs.length != 0) {
+	// while (cNode.childs != null || cNode.childs.length != 0) {
+	// var tmpNode = cNdoe.childs.pop();
+	// this.removeAllFromParentTree(tmpNode);
+	// this.removeNode(tmpNode);
+	// }
+	//
+	// } else {
+	// this.removeNode(cNode);
+	// }
+	// };
 
 	this.removeNode = function(node) {
 		delete this.nodesMap[node.id];
@@ -417,6 +355,57 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 			}
 		}
 		return null;
+	};
+
+	this.newNode = function(obj, pObj) {
+		var thisNode = null;
+		// 检查node是否存在
+		if (this.nodes != null && this.nodes.length != 0) {
+			for ( var i = 0; i < this.nodes.length; i++) {
+				if (this.nodes[i].obj.id == obj.id) {
+					thisNode = this.nodes[i];
+					break;
+				}
+			}
+		}
+		if (thisNode == null) {
+			thisNode = new org.xiha.html5.core.Node(obj);
+		}
+		if (pObj != null) {
+			thisNode.addParent(pObj);
+
+			// 检查parent所在node，确保child里面添加入当前node的obj
+			var pNodes = null;
+
+			if (this.nodes != null && this.nodes.length != 0) {
+
+				for ( var i = 0; i < this.nodes.length; i++) {
+					if (this.nodes[i].obj.id == pObj.id) {
+						if (pNodes == null) {
+							pNodes = new Array();
+						}
+						pNodes.push(this.nodes[i]);
+					}
+				}
+			}
+			if (pNodes == null) {
+				pNodes = new Array();
+				pNodes.push(new org.xiha.html5.core.Node(pObj));
+
+			}
+
+			for ( var i = 0; i < pNodes.length; i++) {
+
+				pNodes[i].addChild(obj);
+			}
+
+		} else {
+			var x = Math.floor(thisNode.obj.scene.getWidth() / 2);
+			var y = Math.floor(thisNode.obj.scene.getHeight() / 2);
+			var p = new org.xiha.html5.core.NormalPoint(x, y);
+			thisNode.obj.centerPosition = p;
+			window.org.xiha.html5.core.scene.setRootNode(thisNode);
+		}
 	};
 
 	window.org.xiha.html5.core.nodeUtil = this;

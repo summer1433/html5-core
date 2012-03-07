@@ -105,7 +105,9 @@
 					* Math.sin(30 * 0.017453293));
 			randomNewCube.centerPosition = new org.xiha.html5.core.NormalPoint(
 					x, y);
-			new org.xiha.html5.core.Node(randomNewCube, parentcube, null);
+
+			window.org.xiha.html5.core.nodeUtil.newNode(randomNewCube,
+					parentcube);
 
 			window.org.xiha.html5.core.eventPool
 					.addNewEvent(new org.xiha.html5.core.Event(
@@ -117,17 +119,25 @@
 				var sameNode = window.org.xiha.html5.core.nodeUtil
 						.searchNodeByText(this.renderText.text());
 
-				if (sameNode != null) {
+				if (sameNode != null && sameNode.obj.id != this.object.id) {
 					var toNode = sameNode;
-					var pNode = null;
+					var pNodes = new Array();
 					var frmNode = window.org.xiha.html5.core.nodeUtil
 							.searchNodeByCubeId(this.object.id);
 
 					console.log(frmNode);
-					pNode = window.org.xiha.html5.core.nodeUtil
-							.searchNodeByCubeId(frmNode.parent.id);
+					for ( var i = 0; i < frmNode.parents.length; i++) {
+						var tmpnode = window.org.xiha.html5.core.nodeUtil
+								.searchNodeByCubeId(frmNode.parents[i].id);
+						if (tmpnode != null) {
+
+							pNodes.push(tmpnode);
+						}
+
+					}
+
 					window.org.xiha.html5.core.nodeUtil.combineNode(frmNode,
-							toNode, pNode);
+							toNode, pNodes);
 				}
 			}
 			return true;
@@ -184,8 +194,8 @@
 		//var cube12 = createCube();
 		//var cube13 = createCube(); 
 		//开始构造结点以及关联关系
-		var node = new org.xiha.html5.core.Node(cube1, null, null);
-		scene.setRootNode(node);
+		window.org.xiha.html5.core.nodeUtil.newNode(cube1, null);
+		//scene.setRootNode(node);
 
 		//new org.xiha.html5.core.Node(cube2, cube1);
 		/* new org.xiha.html5.core.Node(cube10, cube2, null);
@@ -213,7 +223,11 @@
 
 			var w = 50;
 			var h = w * 0.618;
-			var cube = new org.xiha.html5.core.Arccube(null, w, h);
+
+			var x = Math.floor(Math.random() * 800);
+			var y = Math.floor(Math.random() * 600);
+			var p = new org.xiha.html5.core.NormalPoint(x, y);
+			var cube = new org.xiha.html5.core.Arccube(p, w, h);
 			cube.r = 5;
 			cube.setFillStyle('#dbf514');
 			cube.clickEnable = true;

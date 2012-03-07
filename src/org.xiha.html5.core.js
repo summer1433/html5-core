@@ -38,7 +38,15 @@ org.xiha.html5.core.RenderableText = function(text, fillStyle, font) {
 org.xiha.html5.core.Constants = function() {
 	this.CLICK_EVENT = 'CLICK_EVENT';
 	this.DOUBLE_CLICK_EVENT = 'DOUBLE_CLICK_EVENT';
+	this.MOUSE_CLICK_EVENT = 'MOUSE_CLICK_EVENT';
+	this.MOUSE_DOWN_EVENT = 'MOUSE_DOWN_EVENT';
+	this.MOUSE_MOVE_EVENT = 'MOUSE_MOVE_EVENT';
+	this.MOUSE_UP_EVENT = 'MOUSE_UP_EVENT';
+	this.MOUSE_DBCLICK_EVENT = 'MOUSE_DBCLICK_EVENT';
+
 };
+
+window.org.xiha.html5.core.constants = new org.xiha.html5.core.Constants();
 
 org.xiha.html5.core.Event = function(msg, object) {
 	this.msg = msg;
@@ -66,10 +74,10 @@ org.xiha.html5.core.EventPool = function(maxsize) {
 	this.addNewEvent = function(event) {
 		this.events.push(event);
 
-//		while (this.events.length >= this.maxsize) {
-//			this.events.shift();
-//			console.log("事件满了，丢弃掉没有来得及处理的老事件");
-//		}
+		// while (this.events.length >= this.maxsize) {
+		// this.events.shift();
+		// console.log("事件满了，丢弃掉没有来得及处理的老事件");
+		// }
 
 		return true;
 	};
@@ -78,13 +86,19 @@ org.xiha.html5.core.EventPool = function(maxsize) {
 		var listeners = self.scene.renderAble;
 		if (self.events != null && self.events.length > 0) {
 			var ev = self.events.shift();
-			
+
 			for ( var i = 0; i < listeners.length; i++) {
 				if (listeners[i].listenEvent != null) {
 					listeners[i].listenEvent(ev);
 					// console.log(listeners[i]);
 				}
 			}
+
+			for ( var i = 0; i < self.scene.listners.length; i++) {
+				self.scene.listeners[i].listenEvent(ev);
+				// console.log(listeners[i]);
+			}
+
 		}
 	}, 1);
 

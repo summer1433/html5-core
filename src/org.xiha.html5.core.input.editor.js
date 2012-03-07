@@ -66,10 +66,10 @@ org.xiha.html5.core.input.Editor = function(editorId) {
 };
 
 org.xiha.html5.core.input.Editor.prototype.listenEvent = function(ev) {
-	this.currentEvent = ev;
-	this.object = ev.object;
+	
 	if (ev.msg == (new org.xiha.html5.core.Constants()).DOUBLE_CLICK_EVENT) {
-
+		this.currentEvent = ev;
+		this.object = ev.object;
 		this.display(this.calPosition(this.object));
 	}
 };

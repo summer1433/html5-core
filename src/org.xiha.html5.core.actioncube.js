@@ -2,6 +2,7 @@ request('org.xiha.html5.core');
 
 org.xiha.html5.core.Actioncube = function(centerPosition, w, h, offsetLeft,
 		offsetTop) {
+	var self = this;
 	org.xiha.html5.core.Arccube.call(this, centerPosition, w, h);
 	this.addClickAbility();
 	this.offsetLeft = offsetLeft;
@@ -16,34 +17,33 @@ org.xiha.html5.core.Actioncube = function(centerPosition, w, h, offsetLeft,
 				this.snapTo.centerPosition.getX() + this.offsetLeft,
 				this.snapTo.centerPosition.getY() + this.offsetTop);
 	};
+	var superListenEvent = this.listenEvent;
 
+	this.listenEvent = function(ev) {
+		superListenEvent(ev);
+		if (ev.msg == window.org.xiha.html5.core.constants.CLICK_EVENT) {
+			self.currentEvent = ev;
+			self.snapTo = ev.object;
+			if (self.snapTo.typeId == 0) {
+
+				var cp = new org.xiha.html5.core.NormalPoint(
+						self.snapTo.centerPosition.getX() + self.offsetLeft,
+						self.snapTo.centerPosition.getY() + self.offsetTop);
+				self.centerPosition = cp;
+			} else {
+				self.centerPosition = null;
+			}
+		}
+		// console.log(e);
+	};
 };
 
 org.xiha.html5.util.extend(org.xiha.html5.core.Actioncube,
 		org.xiha.html5.core.Arccube);
 
-org.xiha.html5.core.Actioncube.prototype.listenEvent = function(ev) {
-	this.currentEvent = ev;
-	if (ev.msg == (new org.xiha.html5.core.Constants()).CLICK_EVENT) {
-		this.snapTo = ev.object;
-		if (this.snapTo.typeId == 0) {
-
-			var cp = new org.xiha.html5.core.NormalPoint(
-					this.snapTo.centerPosition.getX() + this.offsetLeft,
-					this.snapTo.centerPosition.getY() + this.offsetTop);
-			this.centerPosition = cp;
-		}else{
-			this.centerPosition = null;
-		}
-	}
-	// console.log(e);
-};
-
-org.xiha.html5.core.Actioncube.prototype.mouseclickAction = function(ev) {
+org.xiha.html5.core.Actioncube.prototype.mouseclickAction = function() {
 	var self = this;
-	var evt = window.event || arguments[0];
-	var mouse = org.xiha.html5.util.getMouse(evt, this.getCanvas());
-	if (self.isOver(mouse)) {
+	if (self.isOver(self.scene.mouse)) {
 		self.doClick();
 
 	}
