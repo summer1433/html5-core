@@ -94,7 +94,7 @@ org.xiha.html5.core.EventPool = function(maxsize) {
 				}
 			}
 
-			for ( var i = 0; i < self.scene.listners.length; i++) {
+			for ( var i = 0; i < self.scene.listeners.length; i++) {
 				self.scene.listeners[i].listenEvent(ev);
 				// console.log(listeners[i]);
 			}

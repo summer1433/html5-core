@@ -321,20 +321,34 @@ org.xiha.html5.core.NodeUtil = function(radius) {
 		this.removeNode(frmNode);
 	};
 
-	// 从树上的子节点删除所有节点，释放内存
-	// this.removeAllFromParentTree = function(cNode) {
-	// if (cNode.childs != null && cNode.childs.length != 0) {
-	// while (cNode.childs != null || cNode.childs.length != 0) {
-	// var tmpNode = cNdoe.childs.pop();
-	// this.removeAllFromParentTree(tmpNode);
-	// this.removeNode(tmpNode);
-	// }
-	//
-	// } else {
-	// this.removeNode(cNode);
-	// }
-	// };
+	this.autoCombine = function(text, selfId) {
 
+		var sameNode = window.org.xiha.html5.core.nodeUtil
+				.searchNodeByText(text);
+
+		if (sameNode != null && sameNode.obj.id != selfId) {
+			var toNode = sameNode;
+			var pNodes = new Array();
+			var frmNode = window.org.xiha.html5.core.nodeUtil
+					.searchNodeByCubeId(selfId);
+
+			console.log(frmNode);
+			for ( var i = 0; i < frmNode.parents.length; i++) {
+				var tmpnode = window.org.xiha.html5.core.nodeUtil
+						.searchNodeByCubeId(frmNode.parents[i].id);
+				if (tmpnode != null) {
+
+					pNodes.push(tmpnode);
+				}
+
+			}
+
+			window.org.xiha.html5.core.nodeUtil.combineNode(frmNode, toNode,
+					pNodes);
+
+		}
+
+	};
 	this.removeNode = function(node) {
 		delete this.nodesMap[node.id];
 		for ( var i = 0; i < this.nodes.length; i++) {

@@ -116,29 +116,8 @@
 		}
 		org.xiha.html5.core.input.Editor.prototype.change = function() {
 			if (this.renderText != null) {
-				var sameNode = window.org.xiha.html5.core.nodeUtil
-						.searchNodeByText(this.renderText.text());
-
-				if (sameNode != null && sameNode.obj.id != this.object.id) {
-					var toNode = sameNode;
-					var pNodes = new Array();
-					var frmNode = window.org.xiha.html5.core.nodeUtil
-							.searchNodeByCubeId(this.object.id);
-
-					console.log(frmNode);
-					for ( var i = 0; i < frmNode.parents.length; i++) {
-						var tmpnode = window.org.xiha.html5.core.nodeUtil
-								.searchNodeByCubeId(frmNode.parents[i].id);
-						if (tmpnode != null) {
-
-							pNodes.push(tmpnode);
-						}
-
-					}
-
-					window.org.xiha.html5.core.nodeUtil.combineNode(frmNode,
-							toNode, pNodes);
-				}
+				window.org.xiha.html5.core.nodeUtil.autoCombine(this.renderText
+						.text(), this.object.id);
 			}
 			return true;
 		}
