@@ -156,18 +156,18 @@
 
 		//circle.enableMoving();
 
-		var cube1 = createCube();
-		/* var cube2 = createCube();
-		var cube3 = createCube();
-		var cube4 = createCube();
+		var cube1 = createCube(1);
+		var cube2 = createCube(2);
+		var cube3 = createCube(3);
+		var cube4 = createCube(4);
 
-		var cube5 = createCube();
+		var cube5 = createCube(5);
 		
-		var cube6 = createCube();
+		//var cube6 = createCube(6);
 
-		var cube7 = createCube();
-		var cube8 = createCube();
-		var cube9 = createCube(); */
+		//var cube7 = createCube(7);
+		//var cube8 = createCube(8);
+		//var cube9 = createCube(9); 
 		//var cube10 = createCube();
 		//var cube11 = createCube();
 		//var cube12 = createCube();
@@ -175,12 +175,21 @@
 		//开始构造结点以及关联关系
 		window.org.xiha.html5.core.nodeUtil.newNode(cube1, null);
 		//scene.setRootNode(node);
+        window.org.xiha.html5.core.nodeUtil.newNode(cube2, cube1);
+        window.org.xiha.html5.core.nodeUtil.newNode(cube3, cube1);
 
-		//new org.xiha.html5.core.Node(cube2, cube1);
-		/* new org.xiha.html5.core.Node(cube10, cube2, null);
-		new org.xiha.html5.core.Node(cube11, cube2, null);
-		new org.xiha.html5.core.Node(cube12, cube2, null);
-		new org.xiha.html5.core.Node(cube13, cube2, null); */
+        window.org.xiha.html5.core.nodeUtil.newNode(cube2, cube3);
+        window.org.xiha.html5.core.nodeUtil.newNode(cube3, cube4);
+
+        window.org.xiha.html5.core.nodeUtil.newNode(cube5, cube2);
+        window.org.xiha.html5.core.nodeUtil.newNode(cube4, cube3);
+
+        window.org.xiha.html5.core.nodeUtil.newNode(cube4, cube2);
+
+        //window.org.xiha.html5.core.nodeUtil.newNode(cube6, cube3);
+        //window.org.xiha.html5.core.nodeUtil.newNode(cube7, cube4);
+        //window.org.xiha.html5.core.nodeUtil.newNode(cube8, cube6);
+        //window.org.xiha.html5.core.nodeUtil.newNode(cube9, cube7);
 
 		/* new org.xiha.html5.core.Node(cube3, cube1);
 		new org.xiha.html5.core.Node(cube4, cube1);
@@ -198,7 +207,7 @@
 		scene.ready();
 		scene.forceBalance(30);
 		//scene.gravity(2);
-		function createCube() {
+		function createCube(num) {
 
 			var w = 50;
 			var h = w * 0.618;
@@ -207,6 +216,11 @@
 			var y = Math.floor(Math.random() * 600);
 			var p = new org.xiha.html5.core.NormalPoint(x, y);
 			var cube = new org.xiha.html5.core.Arccube(p, w, h);
+			
+			//var randomText = 'text_'+ Math.floor(Math.random()*10000);
+			var randomText = 'text_'+ num;
+            cube.renderableText = new org.xiha.html5.core.RenderableText(randomText,"black","12px/29px sans-serif");
+
 			cube.r = 5;
 			cube.setFillStyle('#dbf514');
 			cube.clickEnable = true;
