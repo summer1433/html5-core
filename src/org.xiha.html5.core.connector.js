@@ -50,6 +50,8 @@ org.xiha.html5.core.ConnectorUtil = function() {
 
 org.xiha.html5.core.Connector = function(cube1, cube2, strokeStyle, fillStyle,
 		lineWidth) {
+	var self = this;
+	this.isDisplay = true;
 	this.id = null;
 	this.scene = org.xiha.html5.core.scene;
 	this.cube1 = cube1;
@@ -59,6 +61,41 @@ org.xiha.html5.core.Connector = function(cube1, cube2, strokeStyle, fillStyle,
 	this.lineWidth = lineWidth;
 	this.renderme = false;
 
+	this.isOver = function(mouse) {
+		var c1 = this.cube1.centerPosition;
+		var c2 = this.cube2.centerPosition;
+		if (c1 == null) {
+			console.log("error cubeid [" + this.cube1.id + "] cp is null");
+		}
+		if (c2 == null) {
+			console.log("error cubeid [" + this.cube2.id + "] cp is null");
+		}
+		var xy1 = this.cal(c1, c2, this.cube1.w, this.cube1.h);
+		var xy2 = this.cal(c2, c1, this.cube2.w, this.cube2.h);
+
+		if (xy1 != null && xy2 != null) {
+			
+
+			var dd1 = this.distance(xy1.x, xy1.y,  mouse[0],  mouse[1]);
+			var dd2 = this.distance(xy2.x, xy2.y,  mouse[0],  mouse[1]);
+			var dd3 = this.distance(xy2.x, xy2.y,  xy1.x, xy1.y);
+
+			if (Math.floor(dd1 + dd2) == Math.floor(dd3)) {
+				
+				
+				return true;
+			}
+		}
+		return false;
+	};
+	
+	this.listenEvent = function(ev) {
+		if (ev.msg == window.org.xiha.html5.core.constants.MOUSE_MOVE_EVENT) {
+
+			
+		}
+
+	};
 	scene.addRenderable(this);
 };
 
@@ -74,6 +111,26 @@ org.xiha.html5.core.Connector.prototype = {
 	},
 	render : function() {
 		var ctx = this.scene.getContext();
+		
+		//渲染被选中
+		
+		if(this.isOver(self.scene.mouse)) {
+			
+			var ctx = this.scene.getContext();
+			
+			var x = self.scene.mouse[0];
+			var y = self.scene.mouse[1];
+
+			ctx.beginPath();
+			ctx.arc(x, y, 4, 0, 2 * Math.PI, false);
+			ctx.fillStyle = "#000000";
+			ctx.closePath();
+			ctx.fill();
+			
+		}
+		
+		
+		//
 		ctx.strokeStyle = this.strokeStyle;
 		ctx.fillStyle = this.fillStyle;
 		ctx.lineWidth = this.lineWidth;

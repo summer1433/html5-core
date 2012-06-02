@@ -22,8 +22,22 @@ org.xiha.html5.core.Actioncube = function(centerPosition, w, h, offsetLeft,
 	this.listenEvent = function(ev) {
 		superListenEvent(ev);
 		if (ev.msg == window.org.xiha.html5.core.constants.CLICK_EVENT) {
+
 			self.currentEvent = ev;
+
+			//已经snapTo过则
+			if (self.snapTo != null && ev.object != null){
+				if(self.snapTo.id == ev.object.id) {
+					self.isDisplay = !self.isDisplay;
+				}else{
+					self.isDisplay = true;
+				}
+				
+			}
+				
+
 			self.snapTo = ev.object;
+
 			if (self.snapTo.typeId == 0) {
 
 				var cp = new org.xiha.html5.core.NormalPoint(

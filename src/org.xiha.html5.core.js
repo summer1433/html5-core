@@ -43,7 +43,7 @@ org.xiha.html5.core.Constants = function() {
 	this.MOUSE_MOVE_EVENT = 'MOUSE_MOVE_EVENT';
 	this.MOUSE_UP_EVENT = 'MOUSE_UP_EVENT';
 	this.MOUSE_DBCLICK_EVENT = 'MOUSE_DBCLICK_EVENT';
-
+	this.OVER_RELATION = 'OVER_RELATION';
 };
 
 window.org.xiha.html5.core.constants = new org.xiha.html5.core.Constants();
@@ -88,8 +88,9 @@ org.xiha.html5.core.EventPool = function(maxsize) {
 			var ev = self.events.shift();
 
 			for ( var i = 0; i < listeners.length; i++) {
-				if (listeners[i].listenEvent != null) {
-					listeners[i].listenEvent(ev);
+				var obj = listeners[i];
+				if (obj != null) {
+					obj.listenEvent(ev);
 					// console.log(listeners[i]);
 				}
 			}

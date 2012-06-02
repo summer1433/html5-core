@@ -62,7 +62,7 @@ org.xiha.html5.core.input.Editor = function(editorId) {
 		}
 		return new org.xiha.html5.core.NormalPoint(x, y);
 	};
-	this.scene.addRenderable(this);
+	this.scene.addListener(this);
 };
 
 org.xiha.html5.core.input.Editor.prototype.listenEvent = function(ev) {

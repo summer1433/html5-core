@@ -2,6 +2,8 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	var self = this;
 	this.id = id;
 	this.objectIdSequence = 0;
+	this.listenerIdSequence = 0;
+
 	this.objectMap = {};
 	this.renderAble = new Array();
 	this.listeners = new Array();
@@ -12,7 +14,7 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	this.isMultiSelect = false;
 	this.allRender = true;
 	this.rootNode = null;
-	this.mouse = null;
+	this.mouse = [ 0, 0 ];
 	this.setRootNode = function(node) {
 		this.rootNode = node;
 	};
@@ -29,7 +31,8 @@ org.xiha.html5.core.Scene = function(canvas, id) {
 	};
 	this.addListener = function(obj) {
 		if (obj.listenEvent != null) {
-
+			this.listenerIdSequence++;
+			obj.id = this.listenerIdSequence;// 让每个listener都有唯一ID
 			this.listeners.push(obj);
 		} else {
 			console.log("obj not implements listenEvent function!!");
@@ -146,24 +149,40 @@ org.xiha.html5.core.Scene.prototype = {
 
 		// 渲染所有可渲染的组件
 		// TODO 设定渲染先后顺序，因为渲染的时候需要Clear，所以必须得设定顺序
-		setInterval(function() {
+		setInterval(
+				function() {
 
-			if (self.allRender) {
+					if (self.allRender) {
 
-				self.clearScene();
-				// self.nodeUtil.ergod(self.rootNode);
-				for ( var i = 0; i < self.renderAble.length; i++) {
-					if (self.renderAble[i].render != null)
-						self.renderAble[i].render();
+						self.clearScene();
+						// self.nodeUtil.ergod(self.rootNode);
+						var actionRenderAble = new Array();
+						for ( var i = 0; i < self.renderAble.length; i++) {
 
-				}
+							if (self.renderAble[i].render != null)
+								if (self.renderAble[i] instanceof org.xiha.html5.core.Actioncube) {
+									actionRenderAble.push(self.renderAble[i]);
+								} else {
+									if (self.renderAble[i].isDisplay) {
 
-				self.allRender = false;
-			}
+										self.renderAble[i].render();
+									}
+								}
 
-			//
+						}
+						//使actionRenderAble对象始终在最上层，不被阻挡
+						for ( var i = 0; i < actionRenderAble.length; i++) {
+							if (actionRenderAble[i].isDisplay) {
+								actionRenderAble[i].render();
+							}
+						}
 
-		}, 1);
+						self.allRender = false;
+					}
+
+					//
+
+				}, 1);
 
 	},
 

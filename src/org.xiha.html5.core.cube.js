@@ -18,7 +18,8 @@ org.xiha.html5.core.Cube = function(centerPosition, w, h) {
 	this.enableMove = false;
 	this.clickDisable = false;
 	this.renderme = false;
-
+	this.isDisplay = true;
+	
 	this.savedFillStyle = '';
 	this.fillStyle = '';
 	this.task = '';
@@ -290,9 +291,9 @@ org.xiha.html5.core.Cube.prototype.mousemoveAction = function() {
 			- (this.mouseOverPosition.getY() - mouse[1]);
 
 	self.uniformMoveTo(nx, ny, mouse[0], mouse[1]);
-	window.org.xiha.html5.core.eventPool
-			.addNewEvent(new org.xiha.html5.core.Event(
-					window.org.xiha.html5.core.constants.CLICK_EVENT, self));
+//	window.org.xiha.html5.core.eventPool
+//			.addNewEvent(new org.xiha.html5.core.Event(
+//					window.org.xiha.html5.core.constants.CLICK_EVENT, self));
 	// /self.scene.checkOverlap();
 	self.scene.allRender = true;
 };
